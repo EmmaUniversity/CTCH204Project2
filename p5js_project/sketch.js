@@ -4,19 +4,21 @@ const canvasHeight = 400
 const canvasWidth = 600;
 
 const objPlayer = {
-    x: 0,
-    y: 0,
-    w: 16, //used for collision
-    h: 16, //used for collision
-    xSpd: 0,
-    ySpd: 0,
+    position: null,
+    size: null, //used for collision
+    velocity: null,
+
+    init: function(pos) {
+        this.position = createVector(pos.x, pos.y);
+        this.size = createVector(1, 1);
+        this.velocity = createVector(0, 0)
+    },
     step: function() {
-        this.x += this.xSpd;
-        this.y += this.ySpd;
-        this.ySpd += 0.25;
+        this.velocity.y += 0.025;
+        this.velocity = moveAndSlide(this, this.velocity);
     },
     draw: function() {
-        image(imgPlayer, this.x, this.y);
+        image(imgPlayer, this.position.x*16, this.position.y*16);
     }
 }
 
@@ -43,9 +45,82 @@ let objects = [];
 
 let cameraPosition;
 
-//TODO:
+//this whole function is pretty ugly and repetitive, but I'm not sure what the cleaner what to do it is
 function moveAndSlide(obj, velocity) {
+    //technically I could just let moveAndSlide update the object's actual velocity,
+    //and maybe this would save a couple lines of code, but this feels safer
+    let vel = velocity.copy();
+
+    //X
+    let rowSpan = createVector(floor(obj.position.y-currentLevel.y), floor((obj.position.y+obj.size.y)-currentLevel.y))
     
+    //set checking point, if traveling right, use position + width, if traveling left, just use position
+    let intendedX; 
+    if (velocity.x > 0) {
+        intendedX = obj.position.x+vel.x+obj.size.x
+    } else {
+        intendedX = obj.position.x+vel.x
+    }
+
+    //index into the tiles matrix
+    let truncatedX = floor(intendedX-currentLevel.x);
+
+    //check for any collisions
+    for (let i = rowSpan.x; i <= rowSpan.y; i++) {
+        if (currentLevel.tiles[truncatedX][i] == 1) {
+            vel.x = 0;
+            break;
+        }
+    }
+
+    //update position
+    if (vel.x == velocity.x) {
+        obj.position.x += vel.x;
+    } else {
+        if (velocity.x > 0) {
+            obj.position.x = (truncatedX+currentLevel.x)-obj.size.x;
+        } else {
+            obj.position.x = truncatedX+currentLevel.x;
+        }
+    }
+
+
+    //Y
+    let columnSpan = createVector(floor(obj.position.x-currentLevel.x), floor((obj.position.x+obj.size.x)-currentLevel.x))
+
+    let intendedY;
+    if (velocity.y > 0) {
+        intendedY = obj.position.y+vel.y+obj.size.y
+    } else {
+        intendedY = obj.position.y+vel.y
+    }
+
+    let truncatedY = floor(intendedY-currentLevel.y);
+
+    for (let i = columnSpan.x; i <= columnSpan.y; i++) {
+        if (currentLevel.tiles[i][truncatedY] == 1) {
+            vel.y = 0;
+            break;
+        }
+    }
+
+    if (vel.y == velocity.y) {
+        obj.position.y += vel.y;
+    } else {
+        if (velocity.y > 0) {
+            obj.position.y = (truncatedY+currentLevel.y)-obj.size.y;
+        } else {
+            obj.position.y = truncatedY+currentLevel.y;
+        }
+    }
+
+    return vel;
+}
+
+function instantiateObject(objPrototype, position) { //maybe misuing the word prototype here, idk
+    let obj = Object.create(objPrototype);
+    obj.init(position);
+    objects.push(obj);
 }
 
 async function loadLevels() {
@@ -58,16 +133,16 @@ async function loadLevels() {
         
         thisLevel.id = i;
         thisLevel.name = json.identifier;
-        thisLevel.x = json.worldX;
-        thisLevel.y = json.worldY;
-        thisLevel.w = json.pxWid;
-        thisLevel.h = json.pxHei;
+        thisLevel.x = json.worldX/16;
+        thisLevel.y = json.worldY/16;
+        thisLevel.w = json.pxWid/16;
+        thisLevel.h = json.pxHei/16;
 
         thisLevel.tiles = []; //without this, all levels reference the same tiles array
-        for (let x = 0; x < json.pxWid/16; x++) {
+        for (let x = 0; x < json.pxWid; x++) {
             let row = []
             thisLevel.tiles.push(row)
-            for (let y = 0; y < json.pxHei/16; y++) {
+            for (let y = 0; y < json.pxHei; y++) {
                 row.push(json.layerInstances[1].intGridCsv[(y*16)+x])
             }
         }
@@ -91,7 +166,10 @@ async function setup() {
     cameraPosition = createVector(-32, -32);
     imgTiles = await loadImage("p5js_project/assets/tiles.png");
     imgPlayer = await loadImage("p5js_project/assets/player.png");
-    objects.push(Object.create(objPlayer));
+    
+    instantiateObject(objPlayer, createVector(4, 4));
+    instantiateObject(objPlayer, createVector(3, 4));
+    instantiateObject(objPlayer, createVector(7, 6));
 
     loadLevel(0);
 }
@@ -117,8 +195,8 @@ function draw() {
 
     translate(-cameraPosition.x, -cameraPosition.y);
     
-    for (let y = 0; y < currentLevel.h/16; y++) {
-        for (let x = 0; x < currentLevel.w/16; x++) {
+    for (let y = 0; y < currentLevel.h; y++) {
+        for (let x = 0; x < currentLevel.w; x++) {
             if (currentLevel.tiles[x][y] == 1) {
                 image(imgTiles, x*16, y*16, 16, 16, 0, 0, 16, 16);
             }
