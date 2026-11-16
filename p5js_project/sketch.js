@@ -4,14 +4,19 @@ const canvasHeight = 400
 const canvasWidth = 600;
 
 const objPlayer = {
-    x: 100,
-    y: 100,
+    x: 0,
+    y: 0,
     w: 16, //used for collision
     h: 16, //used for collision
     xSpd: 0,
     ySpd: 0,
     step: function() {
-
+        this.x += this.xSpd;
+        this.y += this.ySpd;
+        this.ySpd += 0.25;
+    },
+    draw: function() {
+        image(imgPlayer, this.x, this.y);
     }
 }
 
@@ -27,16 +32,19 @@ const level = {
 }
 
 let imgTiles;
+let imgPlayer;
 
 let levels = [];
 let levelNames;
 let currentLevel;
 let currentLevelId;
 
+let objects = [];
+
 let cameraPosition;
 
 //TODO:
-function moveAndSlide(obj, xSpd, ySpd) {
+function moveAndSlide(obj, velocity) {
     
 }
 
@@ -83,6 +91,7 @@ async function setup() {
     cameraPosition = createVector(-32, -32);
     imgTiles = await loadImage("p5js_project/assets/tiles.png");
     imgPlayer = await loadImage("p5js_project/assets/player.png");
+    objects.push(Object.create(objPlayer));
 
     loadLevel(0);
 }
@@ -94,8 +103,11 @@ function loadLevel(index) {
 
 function draw() {
     background(220);
-    textSize(25);
     
+    for (var i = 0; i < objects.length; i++) {
+        objects[i].step();
+    }
+
     //noStroke();
     //fill("red")
     //for (let i = 0; i < levels.length; i++) {
@@ -111,6 +123,10 @@ function draw() {
                 image(imgTiles, x*16, y*16, 16, 16, 0, 0, 16, 16);
             }
         }
+    }
+
+    for (var i = 0; i < objects.length; i++) {
+        objects[i].draw();
     }
 
 }
