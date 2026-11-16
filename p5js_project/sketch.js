@@ -1,7 +1,11 @@
 //for the sake of resizing the canvas
 const scale = window.devicePixelRatio
-const canvasHeight = 400
-const canvasWidth = 600;
+const canvasWidth = 32*18;
+const canvasHeight = 32*18;
+const pixelSize = 2;
+
+let viewport;
+let canvasElement;
 
 const objPlayer = {
     position: null,
@@ -18,7 +22,7 @@ const objPlayer = {
         this.velocity = moveAndSlide(this, this.velocity);
     },
     draw: function() {
-        image(imgPlayer, this.position.x*16, this.position.y*16);
+        viewport.image(imgPlayer, this.position.x*16, this.position.y*16);
     }
 }
 
@@ -44,6 +48,39 @@ let currentLevelId;
 let objects = [];
 
 let cameraPosition;
+
+
+
+async function setup() {
+    //rescale the canvas so that it displays at 1 unit = 1 screen pixel
+    // css pixels do not necessarily equal physical pixels
+    // which means that any pixel art will get akwardly rescaled when drawn to the screen.
+    createCanvas(canvasWidth, canvasHeight);
+    print(scale)
+    canvasElement = document.getElementById("defaultCanvas0");
+    canvasElement.setAttribute('style', 'width: ' + str(canvasWidth/scale) + 'px; height: ' + str(canvasHeight/scale) + 'px;')
+
+    print(canvasElement);
+    print(canvasWidth/scale);
+
+    await loadLevels();
+
+    viewport = createGraphics(canvasWidth/pixelSize, canvasHeight/pixelSize)
+
+    cameraPosition = createVector(-1, -1);
+    imgTiles = await loadImage("p5js_project/assets/tiles.png");
+    imgPlayer = await loadImage("p5js_project/assets/player.png");
+    
+    instantiateObject(objPlayer, createVector(4, 4));
+    instantiateObject(objPlayer, createVector(3, 4));
+    instantiateObject(objPlayer, createVector(7, 6));
+
+    loadLevel(0);
+
+    canvasElement.setAttribute('style', 'width: ' + str(canvasWidth/scale) + 'px; height: ' + str(canvasHeight/scale) + 'px;')
+}
+
+
 
 //this whole function is pretty ugly and repetitive, but I'm not sure what the cleaner what to do it is
 function moveAndSlide(obj, velocity) {
@@ -152,59 +189,48 @@ async function loadLevels() {
     }
 }
 
-async function setup() {
-    //rescale the canvas so that it displays at 1 unit = 1 screen pixel
-    // css pixels do not necessarily equal physical pixels
-    // which means that any pixel art will get akwardly rescaled when drawn to the screen.
-    createCanvas(canvasWidth, canvasHeight);
-    print(scale)
-    let canvasElement = document.getElementById("defaultCanvas0");
-    canvasElement.setAttribute('style', 'width: ' + str(canvasWidth/scale) + 'px; height: ' + str(canvasHeight/scale) + 'px;')
-
-    await loadLevels();
-
-    cameraPosition = createVector(-32, -32);
-    imgTiles = await loadImage("p5js_project/assets/tiles.png");
-    imgPlayer = await loadImage("p5js_project/assets/player.png");
-    
-    instantiateObject(objPlayer, createVector(4, 4));
-    instantiateObject(objPlayer, createVector(3, 4));
-    instantiateObject(objPlayer, createVector(7, 6));
-
-    loadLevel(0);
-}
-
 function loadLevel(index) {
     currentLevelId = index;
     currentLevel = levels[index];
 }
 
+
+
 function draw() {
-    background(220);
+
+    //setup
+    viewport.noSmooth();
+    viewport.pixelDensity(1);
+    viewport.background(220);
     
+    //object step
     for (var i = 0; i < objects.length; i++) {
         objects[i].step();
     }
 
-    //noStroke();
-    //fill("red")
-    //for (let i = 0; i < levels.length; i++) {
-    //    var thisLevel = levels[i]
-    //    rect((canvasWidth/2)+thisLevel.x/16, (canvasHeight/2)+thisLevel.y/16, thisLevel.w/16, thisLevel.h/16);
-    //}
-
-    translate(-cameraPosition.x, -cameraPosition.y);
-    
+    //draw tiles
+    viewport.translate(-cameraPosition.x*16, -cameraPosition.y*16); 
     for (let y = 0; y < currentLevel.h; y++) {
         for (let x = 0; x < currentLevel.w; x++) {
             if (currentLevel.tiles[x][y] == 1) {
-                image(imgTiles, x*16, y*16, 16, 16, 0, 0, 16, 16);
+                viewport.image(imgTiles, x*16, y*16, 16, 16, 0, 0, 16, 16);
             }
         }
     }
 
+    //draw objects
     for (var i = 0; i < objects.length; i++) {
         objects[i].draw();
     }
+
+    viewport.resetMatrix();
+
+    //draw game to canvas
+    pixelDensity(1);
+    noSmooth();
+    image(viewport, 0, 0, canvasWidth, canvasHeight);
+    //one of these draw functions tries to resize the canvas
+    //so I repeat this every frame as a bandaid fix
+    canvasElement.setAttribute('style', 'width: ' + str(canvasWidth/scale) + 'px; height: ' + str(canvasHeight/scale) + 'px;');
 
 }
