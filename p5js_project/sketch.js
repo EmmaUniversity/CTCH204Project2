@@ -3,6 +3,18 @@ const scale = window.devicePixelRatio
 const canvasHeight = 400
 const canvasWidth = 600;
 
+const objPlayer = {
+    x: 100,
+    y: 100,
+    w: 16, //used for collision
+    h: 16, //used for collision
+    xSpd: 0,
+    ySpd: 0,
+    step: function() {
+
+    }
+}
+
 const level = {
     id: 0,
     name: "",
@@ -11,21 +23,30 @@ const level = {
     w: 0,
     h: 0,
     connectedLevels: [],
-    data: null
+    tiles: [],
 }
 
-const levelData = {
-
-}
+let imgTiles;
 
 let levels = [];
+let levelNames;
+let currentLevel;
+let currentLevelId;
+
+let cameraPosition;
+
+//TODO:
+function moveAndSlide(obj, xSpd, ySpd) {
+    
+}
 
 async function loadLevels() {
     let levelsJson = await loadJSON("p5js_project/levels.ldtk");
+    levelNames = new Map;
 
     for (let i = 0; i < levelsJson.levels.length; i++) {
-        var json = levelsJson.levels[i];
-        var thisLevel = Object.create(level); //naming this weird because of the way I named the tempalte object ;-;
+        let json = levelsJson.levels[i];
+        let thisLevel = Object.create(level); //naming this weird because of the way I named the tempalte object ;-;
         
         thisLevel.id = i;
         thisLevel.name = json.identifier;
@@ -34,9 +55,18 @@ async function loadLevels() {
         thisLevel.w = json.pxWid;
         thisLevel.h = json.pxHei;
 
+        thisLevel.tiles = []; //without this, all levels reference the same tiles array
+        for (let x = 0; x < json.pxWid/16; x++) {
+            let row = []
+            thisLevel.tiles.push(row)
+            for (let y = 0; y < json.pxHei/16; y++) {
+                row.push(json.layerInstances[1].intGridCsv[(y*16)+x])
+            }
+        }
+
         levels.push(thisLevel);
+        levelNames.set(json.identifier, i);
     }
-    //Object.create
 }
 
 async function setup() {
@@ -49,16 +79,38 @@ async function setup() {
     canvasElement.setAttribute('style', 'width: ' + str(canvasWidth/scale) + 'px; height: ' + str(canvasHeight/scale) + 'px;')
 
     await loadLevels();
+
+    cameraPosition = createVector(-32, -32);
+    imgTiles = await loadImage("p5js_project/assets/tiles.png");
+    imgPlayer = await loadImage("p5js_project/assets/player.png");
+
+    loadLevel(0);
+}
+
+function loadLevel(index) {
+    currentLevelId = index;
+    currentLevel = levels[index];
 }
 
 function draw() {
     background(220);
     textSize(25);
     
-    noStroke();
-    fill("red")
-    for (let i = 0; i < levels.length; i++) {
-        var thisLevel = levels[i]
-        rect((canvasWidth/2)+thisLevel.x/16, (canvasHeight/2)+thisLevel.y/16, thisLevel.w/16, thisLevel.h/16);
+    //noStroke();
+    //fill("red")
+    //for (let i = 0; i < levels.length; i++) {
+    //    var thisLevel = levels[i]
+    //    rect((canvasWidth/2)+thisLevel.x/16, (canvasHeight/2)+thisLevel.y/16, thisLevel.w/16, thisLevel.h/16);
+    //}
+
+    translate(-cameraPosition.x, -cameraPosition.y);
+    
+    for (let y = 0; y < currentLevel.h/16; y++) {
+        for (let x = 0; x < currentLevel.w/16; x++) {
+            if (currentLevel.tiles[x][y] == 1) {
+                image(imgTiles, x*16, y*16, 16, 16, 0, 0, 16, 16);
+            }
+        }
     }
+
 }
