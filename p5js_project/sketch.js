@@ -18,7 +18,19 @@ const objPlayer = {
         this.velocity = createVector(0, 0)
     },
     step: function() {
+        let hKey = keyIsDown('d')-keyIsDown('a');
+        this.velocity.x = hKey * 0.1;
+        
+        //using w because I can't be bothered to figure out the key code for space
+        if (keyIsDown('w')) {
+            //need a proper isGrounded function
+            if (this.velocity.y == 0) {
+                this.velocity.y = -0.425;
+            }
+        }
+
         this.velocity.y += 0.025;
+
         this.velocity = moveAndSlide(this, this.velocity);
     },
     draw: function() {
@@ -66,16 +78,12 @@ async function setup() {
     await loadLevels();
 
     viewport = createGraphics(canvasWidth/pixelSize, canvasHeight/pixelSize)
-
     cameraPosition = createVector(-1, -1);
     imgTiles = await loadImage("p5js_project/assets/tiles.png");
     imgPlayer = await loadImage("p5js_project/assets/player.png");
     
-    instantiateObject(objPlayer, createVector(4, 4));
-    instantiateObject(objPlayer, createVector(3, 4));
-    instantiateObject(objPlayer, createVector(7, 6));
-
     loadLevel(0);
+    instantiateObject(objPlayer, createVector(7, 11));
 
     canvasElement.setAttribute('style', 'width: ' + str(canvasWidth/scale) + 'px; height: ' + str(canvasHeight/scale) + 'px;')
 }
@@ -89,24 +97,27 @@ function moveAndSlide(obj, velocity) {
     let vel = velocity.copy();
 
     //X
-    let rowSpan = createVector(floor(obj.position.y-currentLevel.y), floor((obj.position.y+obj.size.y)-currentLevel.y))
+    let rowSpan = createVector(max(floor(obj.position.y-currentLevel.y), 0), 
+                               min(floor((obj.position.y+(obj.size.y-0.000001))-currentLevel.y), currentLevel.h-1));
     
     //set checking point, if traveling right, use position + width, if traveling left, just use position
     let intendedX; 
     if (velocity.x > 0) {
-        intendedX = obj.position.x+vel.x+obj.size.x
+        intendedX = obj.position.x+vel.x+(obj.size.x-0.000001);
     } else {
-        intendedX = obj.position.x+vel.x
+        intendedX = obj.position.x+vel.x;
     }
 
     //index into the tiles matrix
     let truncatedX = floor(intendedX-currentLevel.x);
 
     //check for any collisions
-    for (let i = rowSpan.x; i <= rowSpan.y; i++) {
-        if (currentLevel.tiles[truncatedX][i] == 1) {
-            vel.x = 0;
-            break;
+    if (truncatedX < currentLevel.w) {
+        for (let i = rowSpan.x; i <= rowSpan.y; i++) {
+            if (currentLevel.tiles[truncatedX][i] == 1) {
+                vel.x = 0;
+                break;
+            }
         }
     }
 
@@ -117,27 +128,30 @@ function moveAndSlide(obj, velocity) {
         if (velocity.x > 0) {
             obj.position.x = (truncatedX+currentLevel.x)-obj.size.x;
         } else {
-            obj.position.x = truncatedX+currentLevel.x;
+            obj.position.x = truncatedX+currentLevel.x+1;
         }
     }
 
 
     //Y
-    let columnSpan = createVector(floor(obj.position.x-currentLevel.x), floor((obj.position.x+obj.size.x)-currentLevel.x))
+    let columnSpan = createVector(max(floor(obj.position.x-currentLevel.x), 0), 
+                                  min(floor((obj.position.x+(obj.size.x-0.000001))-currentLevel.x), currentLevel.w-1));
 
     let intendedY;
     if (velocity.y > 0) {
-        intendedY = obj.position.y+vel.y+obj.size.y
+        intendedY = obj.position.y+vel.y+(obj.size.y-0.000001);
     } else {
-        intendedY = obj.position.y+vel.y
+        intendedY = obj.position.y+vel.y;
     }
 
     let truncatedY = floor(intendedY-currentLevel.y);
 
-    for (let i = columnSpan.x; i <= columnSpan.y; i++) {
-        if (currentLevel.tiles[i][truncatedY] == 1) {
-            vel.y = 0;
-            break;
+    if (truncatedY < currentLevel.h) {
+        for (let i = columnSpan.x; i <= columnSpan.y; i++) {
+            if (currentLevel.tiles[i][truncatedY] == 1) {
+                vel.y = 0;
+                break;
+            }
         }
     }
 
@@ -147,7 +161,7 @@ function moveAndSlide(obj, velocity) {
         if (velocity.y > 0) {
             obj.position.y = (truncatedY+currentLevel.y)-obj.size.y;
         } else {
-            obj.position.y = truncatedY+currentLevel.y;
+            obj.position.y = truncatedY+currentLevel.y+1;
         }
     }
 
