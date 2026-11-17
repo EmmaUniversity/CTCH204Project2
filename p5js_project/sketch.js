@@ -35,7 +35,7 @@ const objPlayer = {
         }
 
         //push the player upward if they're at the bottom of a vertical level transition
-        if (floor(this.position.y <= currentLevel.y) && (this.velocity.y < 0)) {
+        if ((floor(this.position.y) <= currentLevel.y) && (this.velocity.y < 0)) {
             this.velocity.y = -0.5;
         }
         this.velocity.y = max(-0.5, this.velocity.y+0.025);
@@ -344,12 +344,18 @@ function draw() {
     }
 
     //fog
-    //TODO: fix slight jitter on outside edge as camera is moving
     viewport.image(imgFogs[1], currentLevel.x*16, currentLevel.y*16, currentLevel.w*16, 16);
     viewport.image(imgFogs[3], currentLevel.x*16, (currentLevel.y+currentLevel.h-1)*16, currentLevel.w*16, 16);
 
     viewport.image(imgFogs[2], currentLevel.x*16, currentLevel.y*16, 16, currentLevel.h*16);
     viewport.image(imgFogs[0], (currentLevel.x+currentLevel.w-1)*16, currentLevel.y*16, 16, currentLevel.h*16);
+
+    //borders to hide out of bounds objects and fix flickering on level edges when camera moves
+    viewport.fill(255);
+    viewport.rect(cameraPosition.x*16, cameraPosition.y*16, viewport.width, ((currentLevel.y-cameraPosition.y)*16)+1)
+    viewport.rect(cameraPosition.x*16, ((currentLevel.y+currentLevel.h)*16)-1, viewport.width, ((currentLevel.y+(viewport.height/16))-(currentLevel.y+currentLevel.h))*16)
+    viewport.rect(cameraPosition.x*16, cameraPosition.y*16, ((currentLevel.x-cameraPosition.x)*16)+1, viewport.height);
+    viewport.rect(((currentLevel.x+currentLevel.w)*16)-1, cameraPosition.y*16, ((currentLevel.x+(viewport.width/16))-(currentLevel.x+currentLevel.w))*16, viewport.height);
 
     if (transitionAnimationTick < 1) {
         viewport.fill(255-(max(lerp(80, 0, transitionAnimationTick*2), 0)));
