@@ -6,6 +6,7 @@ const pixelSize = 2;
 
 let viewport;
 let canvasElement;
+let titleElement;
 
 const objPlayer = {
     position: null,
@@ -30,7 +31,11 @@ const objPlayer = {
             }
         }
 
-        this.velocity.y += 0.025;
+        if (floor(this.position.y <= currentLevel.y) && (this.velocity.y < 0)) {
+            this.velocity.y = -0.5;
+        }
+
+        this.velocity.y = max(-0.5, this.velocity.y+0.025);
 
         this.velocity = moveAndSlide(this, this.velocity);
 
@@ -68,6 +73,7 @@ const level = {
     h: 0,
     connectedLevels: [],
     tiles: [],
+    title: ""
 }
 
 let imgTiles;
@@ -99,14 +105,11 @@ async function setup() {
     canvasElement.setAttribute('style', 'width: ' + str(canvasWidth/scale) + 'px; height: ' + str(canvasHeight/scale) + 'px;')
     //titleElement = document.getElementsByClassName("levelTitle");
     //https://stackoverflow.com/questions/46558733/how-to-add-a-h1-inside-a-div-using-javascript
-    
-    const brTag = document.createElement('br');
-    document.body.appendChild(brTag);
 
-    const h1Tag = document.createElement('H1');
-    h1Tag.id = "levelTitle";
-    h1Tag.innerHTML = "Loading...";
-    document.body.appendChild(h1Tag);
+    titleElement = document.createElement('H1');
+    titleElement.id = "levelTitle";
+    titleElement.innerHTML = "Loading...";
+    document.body.appendChild(titleElement);
 
     await loadLevels();
 
@@ -237,6 +240,13 @@ async function loadLevels() {
             thisLevel.connectedLevels.push(connection.levelIid);
         }
 
+        for (let i = 0; i < json.fieldInstances.length; i++) {
+            let fieldInstance = json.fieldInstances[i];
+            if (fieldInstance.__identifier == "Title") {
+                thisLevel.title = fieldInstance.__value;
+            }
+        }
+
         levels.push(thisLevel);
         levelNames.set(json.iid, i);
     }
@@ -251,6 +261,7 @@ function loadLevel(index) {
 
     currentLevelId = index;
     currentLevel = levels[index];
+    titleElement.innerHTML = currentLevel.title;
 
     let center = createVector(currentLevel.x+(currentLevel.w/2), currentLevel.y+(currentLevel.h/2));
     

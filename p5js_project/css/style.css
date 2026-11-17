@@ -10,14 +10,10 @@ body {
     align-items: center;
     min-height: 100vh;
     background: #ffffff;
-}
-
-#defaultCanvas0 {
-    float: left;
+    flex-direction: column;
 }
 
 #levelTitle {
     text-align: center;
     color: black;
-    clear: left;
 }

@@ -400,9 +400,9 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "Title", "__type": "String", "__value": "Test", "__tile": null, "defUid": 13, "realEditorValues": [{
+			"fieldInstances": [{ "__identifier": "Title", "__type": "String", "__value": "Challenge", "__tile": null, "defUid": 13, "realEditorValues": [{
 				"id": "V_String",
-				"params": ["Test"]
+				"params": ["Challenge"]
 			}] }],
 			"layerInstances": [
 				{
