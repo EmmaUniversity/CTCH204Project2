@@ -10,6 +10,7 @@ let titleElement;
 
 const playerFoot = {
     isFacingR: true,
+    isFront: true,
     frame: 0,
     position:null //for the sake of correct pixel placement, this position is in pixels instead of tiles
 }
@@ -35,7 +36,8 @@ const objPlayer = {
         this.animFeet.push(foot);
 
         foot = Object.create(playerFoot);
-        foot.position = createVector(pos.x*16, pos.y*16)
+        foot.position = createVector(pos.x*16, pos.y*16);
+        foot.isFront = false;
         this.animFeet.push(foot);
     },
 
@@ -48,9 +50,10 @@ const objPlayer = {
 
         //vertical movement
         //using w because I can't be bothered to figure out the key code for space
+        let isGroundedPreMovement = objIsGrounded(this);
         if (keyIsDown('w')) {
             //need a proper isGrounded function
-            if (objIsGrounded(this)) {
+            if (isGroundedPreMovement) {
                 this.velocity.y = -0.425;
             }
         }
@@ -92,24 +95,62 @@ const objPlayer = {
             }
         }
 
-        let footTargetX = ((this.position.x+0.5)*16)+((-0.5+(1*this.isFacingR))*16)
-        let farthestFoot = 0;
-        let footDistance = 100000;
-        for (let i = 0; i < this.animFeet.length; i++) {
-            let foot = this.animFeet[i];
-            foot.position.y = (this.position.y*16)+(this.size.y*16)
+        if (objIsGrounded(this)) {
+            if ((hKey != 0)) {
+                //WALKING ANIMATION
+                let footTargetX = ((this.position.x+0.5)*16)+((-0.5+(1*this.isFacingR))*16)
+                let farthestFoot = 0;
+                let footDistance = 100000;
+                for (let i = 0; i < this.animFeet.length; i++) {
+                    let foot = this.animFeet[i];
+                    foot.position.y = (this.position.y*16)+(this.size.y*16)
+                    foot.frame = 0;
 
-            let distance = abs(foot.position.x-footTargetX);
-            if (distance < footDistance) {
-                footDistance = distance
+                    let distance = abs(foot.position.x-footTargetX);
+                    if (distance < footDistance) {
+                        footDistance = distance
+                    } else {
+                        farthestFoot = i;
+                    }
+                }
+
+                if (footDistance > 12) {
+                    let foot = this.animFeet[farthestFoot];
+                    foot.position.x = footTargetX;
+                    foot.isFacingR = this.isFacingR; 
+                }
+
             } else {
-                farthestFoot = i;
-            }
-        }
+                //IDLE ANIMATION
+                for (let i = 0; i < this.animFeet.length; i++) {
+                    let foot = this.animFeet[i];
+                    foot.isFacingR = this.isFacingR;
+                    foot.frame = 0;
 
-        if (footDistance > 16) {
-            let foot = this.animFeet[farthestFoot];
-            foot.position.x = footTargetX;
+                    foot.position.y = (this.position.y*16)+(this.size.y*16)
+                    let footTargetX = (((this.position.x+0.5)*16)-4)+(i*8)-((-0.5+(1*this.isFacingR))*8)
+                    let diference = footTargetX-foot.position.x
+                    foot.position.x += min(1, abs(diference))*Math.sign(diference);
+                }
+            }
+
+        } else {
+            //AIR ANIMATION
+            for (let i = 0; i < this.animFeet.length; i++) {
+                let foot = this.animFeet[i];
+                foot.isFacingR = this.isFacingR;
+                foot.position.y = (this.position.y*16)+(this.size.y*16)-(this.velocity.y*16)
+                let footTargetX = (((this.position.x+0.5)*16)-3)+(i*6)-((-0.5+(1*this.isFacingR))*map(this.velocity.y, -0.5, 0.5, 18, 4))
+                foot.position.x = footTargetX;
+
+                if (this.velocity.y < 0.1) {
+                    foot.frame = 2;
+                } else if (this.velocity.y < 0.3) {
+                    foot.frame = 0;
+                } else {
+                    foot.frame = 1;
+                }
+            }
         }
     },
 
@@ -122,7 +163,7 @@ const objPlayer = {
 
         for (let i = 0; i < this.animFeet.length; i++) {
             let foot = this.animFeet[i];
-            viewport.image(imgPlayer, foot.position.x, foot.position.y-8, 8, 8, 0, 16, 8, 8);
+            viewport.image(imgPlayer, foot.position.x-(8*!foot.isFacingR), foot.position.y-8, 8, 8, 0+(8*!foot.isFacingR)+(foot.frame*16), 16+(8*foot.isFront), 8, 8);
         }
     }
 }
