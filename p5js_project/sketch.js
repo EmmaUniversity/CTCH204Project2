@@ -20,31 +20,36 @@ const objPlayer = {
     },
     step: function() {
         //movement
+        //TODO: implement angel frames
+        //horizontal movement
         let hKey = keyIsDown('d')-keyIsDown('a');
         this.velocity.x = hKey * 0.1;
         
+        //vertical movement
         //using w because I can't be bothered to figure out the key code for space
         if (keyIsDown('w')) {
             //need a proper isGrounded function
-            if (this.velocity.y == 0) {
+            if (objIsGrounded(this)) {
                 this.velocity.y = -0.425;
             }
         }
 
+        //push the player upward if they're at the bottom of a vertical level transition
         if (floor(this.position.y <= currentLevel.y) && (this.velocity.y < 0)) {
             this.velocity.y = -0.5;
         }
-
         this.velocity.y = max(-0.5, this.velocity.y+0.025);
 
+        //execute the movement
         this.velocity = moveAndSlide(this, this.velocity);
 
-        let center = this.position.copy();
-        center.x += this.size.x/2
-        center.y += this.size.y/2
 
         //levels
         //try to load another level if player steps out of the current one
+        let center = this.position.copy();
+        center.x += this.size.x/2
+        center.y += this.size.y/2
+        
         if ((center.x < currentLevel.x) || (center.x >= currentLevel.x+currentLevel.w) || (center.y < currentLevel.y) || (center.y > currentLevel.y+currentLevel.h)) {
             let nextLevels = currentLevel.connectedLevels;
             for (let i = 0; i < nextLevels.length; i++) {
@@ -132,84 +137,6 @@ async function setup() {
 
 
 
-//this whole function is pretty ugly and repetitive, but I'm not sure what the cleaner what to do it is
-function moveAndSlide(obj, velocity) {
-    //technically I could just let moveAndSlide update the object's actual velocity,
-    //and maybe this would save a couple lines of code, but this feels safer
-    let vel = velocity.copy();
-
-    //X
-    let rowSpan = createVector(max(floor(obj.position.y-currentLevel.y), 0), 
-                               min(floor((obj.position.y+(obj.size.y-0.000001))-currentLevel.y), currentLevel.h-1));
-    
-    //set checking point, if traveling right, use position + width, if traveling left, just use position
-    let intendedX; 
-    if (velocity.x > 0) {
-        intendedX = obj.position.x+vel.x+(obj.size.x-0.000001);
-    } else {
-        intendedX = obj.position.x+vel.x;
-    }
-
-    //index into the tiles matrix
-    let truncatedX = floor(intendedX-currentLevel.x);
-
-    //check for any collisions
-    if ((truncatedX < currentLevel.w) && (truncatedX >= 0)) {
-        for (let i = rowSpan.x; i <= rowSpan.y; i++) {
-            if (currentLevel.tiles[truncatedX][i] == 1) {
-                vel.x = 0;
-                break;
-            }
-        }
-    }
-
-    //update position
-    if (vel.x == velocity.x) {
-        obj.position.x += vel.x;
-    } else {
-        if (velocity.x > 0) {
-            obj.position.x = (truncatedX+currentLevel.x)-obj.size.x;
-        } else {
-            obj.position.x = truncatedX+currentLevel.x+1;
-        }
-    }
-
-
-    //Y
-    let columnSpan = createVector(max(floor(obj.position.x-currentLevel.x), 0), 
-                                  min(floor((obj.position.x+(obj.size.x-0.000001))-currentLevel.x), currentLevel.w-1));
-
-    let intendedY;
-    if (velocity.y > 0) {
-        intendedY = obj.position.y+vel.y+(obj.size.y-0.000001);
-    } else {
-        intendedY = obj.position.y+vel.y;
-    }
-
-    let truncatedY = floor(intendedY-currentLevel.y);
-
-    if ((truncatedY < currentLevel.h) ** (truncatedY >= 0)) {
-        for (let i = columnSpan.x; i <= columnSpan.y; i++) {
-            if (currentLevel.tiles[i][truncatedY] == 1) {
-                vel.y = 0;
-                break;
-            }
-        }
-    }
-
-    if (vel.y == velocity.y) {
-        obj.position.y += vel.y;
-    } else {
-        if (velocity.y > 0) {
-            obj.position.y = (truncatedY+currentLevel.y)-obj.size.y;
-        } else {
-            obj.position.y = truncatedY+currentLevel.y+1;
-        }
-    }
-
-    return vel;
-}
-
 async function loadLevels() {
     let levelsJson = await loadJSON("p5js_project/levels.ldtk");
     levelNames = new Map;
@@ -280,6 +207,105 @@ function instantiateObject(objPrototype, position) { //maybe misuing the word pr
 
 
 
+//this whole function is pretty ugly and repetitive, but I'm not sure what the cleaner what to do it is
+function moveAndSlide(obj, velocity) {
+    //technically I could just let moveAndSlide update the object's actual velocity,
+    //and maybe this would save a couple lines of code, but this feels safer
+    let vel = velocity.copy();
+
+    //X
+    let rowSpan = createVector(max(floor(obj.position.y-currentLevel.y), 0), 
+                               min(floor((obj.position.y+(obj.size.y-0.000001))-currentLevel.y), currentLevel.h-1));
+    
+    //set checking point, if traveling right, use position + width, if traveling left, just use position
+    let intendedX; 
+    if (velocity.x > 0) {
+        intendedX = obj.position.x+vel.x+(obj.size.x-0.000001);
+    } else {
+        intendedX = obj.position.x+vel.x;
+    }
+
+    //index into the tiles matrix
+    let truncatedX = floor(intendedX-currentLevel.x);
+
+    //check for any collisions
+    if ((truncatedX < currentLevel.w) && (truncatedX >= 0)) {
+        for (let i = rowSpan.x; i <= rowSpan.y; i++) {
+            if (currentLevel.tiles[truncatedX][i] == 1) {
+                vel.x = 0;
+                break;
+            }
+        }
+    }
+
+    //update position
+    if (vel.x == velocity.x) {
+        obj.position.x += vel.x;
+    } else {
+        if (velocity.x > 0) {
+            obj.position.x = (truncatedX+currentLevel.x)-obj.size.x;
+        } else {
+            obj.position.x = truncatedX+currentLevel.x+1;
+        }
+    }
+
+
+    //Y
+    let columnSpan = createVector(max(floor(obj.position.x-currentLevel.x), 0), 
+                                  min(floor((obj.position.x+(obj.size.x-0.000001))-currentLevel.x), currentLevel.w-1));
+
+    let intendedY;
+    if (velocity.y > 0) {
+        intendedY = obj.position.y+vel.y+(obj.size.y-0.000001);
+    } else {
+        intendedY = obj.position.y+vel.y;
+    }
+
+    let truncatedY = floor(intendedY-currentLevel.y);
+
+    if ((truncatedY < currentLevel.h) == (truncatedY >= 0)) {
+        for (let i = columnSpan.x; i <= columnSpan.y; i++) {
+            if (currentLevel.tiles[i][truncatedY] == 1) {
+                vel.y = 0;
+                break;
+            }
+        }
+    }
+
+    if (vel.y == velocity.y) {
+        obj.position.y += vel.y;
+    } else {
+        if (velocity.y > 0) {
+            obj.position.y = (truncatedY+currentLevel.y)-obj.size.y;
+        } else {
+            obj.position.y = truncatedY+currentLevel.y+1;
+        }
+    }
+
+    return vel;
+}
+
+function objIsGrounded(obj) {
+    //based on the moveAndSlide function, except it checks inclusive of the obj's vertical extent rather than up to it
+    let columnSpan = createVector(max(floor(obj.position.x-currentLevel.x), 0), 
+                                  min(floor((obj.position.x+(obj.size.x-0.000001))-currentLevel.x), currentLevel.w-1));
+
+    let intendedY = obj.position.y+obj.velocity.y+(obj.size.y);
+    let truncatedY = floor(intendedY-currentLevel.y);
+
+    if ((truncatedY < currentLevel.h) == (truncatedY >= 0)) {
+        for (let i = columnSpan.x; i <= columnSpan.y; i++) {
+            if (currentLevel.tiles[i][truncatedY] == 1) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+
+
 function draw() {
     //object logic
     for (let i = 0; i < objects.length; i++) {
@@ -317,7 +343,8 @@ function draw() {
         objects[i].draw();
     }
 
-    //fog (not working)
+    //fog
+    //TODO: fix slight jitter on outside edge as camera is moving
     viewport.image(imgFogs[1], currentLevel.x*16, currentLevel.y*16, currentLevel.w*16, 16);
     viewport.image(imgFogs[3], currentLevel.x*16, (currentLevel.y+currentLevel.h-1)*16, currentLevel.w*16, 16);
 
