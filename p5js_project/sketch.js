@@ -72,18 +72,23 @@ const level = {
 
 let imgTiles;
 let imgPlayer;
-let imgFog;
+let imgFogs = [];
 
 let levels = [];
 let levelNames;
 let currentLevel;
-let currentLevelId;
+let currentLevelId = -1;
 
 let objects = [];
 
 let cameraPosition;
 
 
+//level transition animation
+let cameraPositionOld;
+let transitionAnimationTick = 1;
+let oldLevelPosition;
+let oldLevelSize;
 
 async function setup() {
     //rescale the canvas so that it displays at 1 unit = 1 screen pixel
@@ -97,10 +102,14 @@ async function setup() {
 
     viewport = createGraphics(canvasWidth/pixelSize, canvasHeight/pixelSize)
     cameraPosition = createVector(-1, -1);
+    cameraPositionOld = createVector(-1, -1);
     
     imgTiles = await loadImage("p5js_project/assets/tiles.png");
     imgPlayer = await loadImage("p5js_project/assets/player.png");
-    imgFog = await(loadImage("p5js_project/assets/fog.png"))
+    imgFogs = [await(loadImage("p5js_project/assets/fog_e.png")), 
+               await(loadImage("p5js_project/assets/fog_n.png")), 
+               await(loadImage("p5js_project/assets/fog_w.png")), 
+               await(loadImage("p5js_project/assets/fog_s.png"))];
 
     loadLevel(0);
     instantiateObject(objPlayer, createVector(7, 11));
@@ -226,13 +235,22 @@ async function loadLevels() {
 }
 
 function loadLevel(index) {
+    if (currentLevelId != -1) {
+        oldLevelPosition = createVector(currentLevel.x, currentLevel.y);
+        oldLevelSize = createVector(currentLevel.w, currentLevel.h);
+        transitionAnimationTick = 0;
+    }
+
     currentLevelId = index;
     currentLevel = levels[index];
 
     let center = createVector(currentLevel.x+(currentLevel.w/2), currentLevel.y+(currentLevel.h/2));
     
+    cameraPositionOld = cameraPosition.copy();
     cameraPosition.x = center.x-(viewport.width/32)
     cameraPosition.y = center.y-(viewport.height/32)
+
+   
 }
 
 function instantiateObject(objPrototype, position) { //maybe misuing the word prototype here, idk
@@ -244,22 +262,27 @@ function instantiateObject(objPrototype, position) { //maybe misuing the word pr
 
 
 function draw() {
+    //object logic
+    for (let i = 0; i < objects.length; i++) {
+        objects[i].step();
+    }
 
-    //setup
+    //draw setup
     viewport.noSmooth();
     viewport.noStroke();
     viewport.pixelDensity(1);
     viewport.background(255);
     
-    viewport.translate(-cameraPosition.x*16, -cameraPosition.y*16); 
+    //camera animation
+    //maps 0 to 1 on a linear curve to 0 to 1 on a cos curve where 0 is PI and 1 is 0/2PI
+    let smoothTransition = (-cos(transitionAnimationTick*PI)/2)+0.5
+    viewport.translate(-(lerp(cameraPositionOld.x, cameraPosition.x, smoothTransition))*16, 
+                       -(lerp(cameraPositionOld.y, cameraPosition.y, smoothTransition))*16); 
+
+    transitionAnimationTick = min(transitionAnimationTick+0.025, 1);
 
     viewport.fill(220);
     viewport.rect(currentLevel.x*16, currentLevel.y*16, currentLevel.w*16, currentLevel.h*16)
-
-    //object step
-    for (let i = 0; i < objects.length; i++) {
-        objects[i].step();
-    }
 
     //draw tiles
     for (let y = 0; y < currentLevel.h; y++) {
@@ -276,18 +299,16 @@ function draw() {
     }
 
     //fog (not working)
-    viewport.image(imgFog, currentLevel.x*16, currentLevel.y*16, currentLevel.w*16, 16);
-    viewport.resetMatrix();
-    
-    //viewport.translate(currentLevel.x*16, (currentLevel.y-currentLevel.h)*16)
-    //viewport.rotate(PI/2);
-    //viewport.image(imgFog, 0, 0, currentLevel.w*16, 16);
-    
-    //viewport.image(imgFog, currentLevel.x*16, (currentLevel.y*16)-(currentLevel.h*16), currentLevel.w*16, 16);
-    //viewport.rotate(PI/2);
-    //viewport.image(imgFog, (currentLevel.x*16)-(currentLevel.w*16), (currentLevel.y*16)-(currentLevel.h*16), currentLevel.w*16, 16);
-    //viewport.rotate(PI/2);
-    //viewport.image(imgFog, (currentLevel.x*16)-(currentLevel.w*16), currentLevel.y*16, currentLevel.w*16, 16);
+    viewport.image(imgFogs[1], currentLevel.x*16, currentLevel.y*16, currentLevel.w*16, 16);
+    viewport.image(imgFogs[3], currentLevel.x*16, (currentLevel.y+currentLevel.h-1)*16, currentLevel.w*16, 16);
+
+    viewport.image(imgFogs[2], currentLevel.x*16, currentLevel.y*16, 16, currentLevel.h*16);
+    viewport.image(imgFogs[0], (currentLevel.x+currentLevel.w-1)*16, currentLevel.y*16, 16, currentLevel.h*16);
+
+    if (transitionAnimationTick < 1) {
+        viewport.fill(255-(max(lerp(80, 0, transitionAnimationTick*2), 0)));
+        viewport.rect((oldLevelPosition.x+1)*16, (oldLevelPosition.y+1)*16, (oldLevelSize.x-2)*16, (oldLevelSize.y-2)*16);
+    }
 
     //reset
     viewport.resetMatrix();
