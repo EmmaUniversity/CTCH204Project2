@@ -18,6 +18,7 @@ const objPlayer = {
         this.velocity = createVector(0, 0)
     },
     step: function() {
+        //movement
         let hKey = keyIsDown('d')-keyIsDown('a');
         this.velocity.x = hKey * 0.1;
         
@@ -32,11 +33,31 @@ const objPlayer = {
         this.velocity.y += 0.025;
 
         this.velocity = moveAndSlide(this, this.velocity);
+
+        let center = this.position.copy();
+        center.x += this.size.x/2
+        center.y += this.size.y/2
+
+        //levels
+        //try to load another level if player steps out of the current one
+        if ((center.x < currentLevel.x) || (center.x >= currentLevel.x+currentLevel.w) || (center.y < currentLevel.y) || (center.y > currentLevel.y+currentLevel.h)) {
+            let nextLevels = currentLevel.connectedLevels;
+            for (let i = 0; i < nextLevels.length; i++) {
+                let connectedLevelIndex = levelNames.get(nextLevels[i])
+                let connectedLevel = levels[connectedLevelIndex];
+                if ((center.x >= connectedLevel.x) && (center.x < connectedLevel.x+currentLevel.w) && (center.y >= connectedLevel.y) && (center.y < connectedLevel.y+currentLevel.h)) {
+                    loadLevel(connectedLevelIndex);
+                    break;
+                }
+            }
+        }
     },
     draw: function() {
         viewport.image(imgPlayer, this.position.x*16, this.position.y*16);
     }
 }
+
+
 
 const level = {
     id: 0,
@@ -51,6 +72,7 @@ const level = {
 
 let imgTiles;
 let imgPlayer;
+let imgFog;
 
 let levels = [];
 let levelNames;
@@ -68,20 +90,18 @@ async function setup() {
     // css pixels do not necessarily equal physical pixels
     // which means that any pixel art will get akwardly rescaled when drawn to the screen.
     createCanvas(canvasWidth, canvasHeight);
-    print(scale)
     canvasElement = document.getElementById("defaultCanvas0");
     canvasElement.setAttribute('style', 'width: ' + str(canvasWidth/scale) + 'px; height: ' + str(canvasHeight/scale) + 'px;')
-
-    print(canvasElement);
-    print(canvasWidth/scale);
 
     await loadLevels();
 
     viewport = createGraphics(canvasWidth/pixelSize, canvasHeight/pixelSize)
     cameraPosition = createVector(-1, -1);
+    
     imgTiles = await loadImage("p5js_project/assets/tiles.png");
     imgPlayer = await loadImage("p5js_project/assets/player.png");
-    
+    imgFog = await(loadImage("p5js_project/assets/fog.png"))
+
     loadLevel(0);
     instantiateObject(objPlayer, createVector(7, 11));
 
@@ -112,7 +132,7 @@ function moveAndSlide(obj, velocity) {
     let truncatedX = floor(intendedX-currentLevel.x);
 
     //check for any collisions
-    if (truncatedX < currentLevel.w) {
+    if ((truncatedX < currentLevel.w) && (truncatedX >= 0)) {
         for (let i = rowSpan.x; i <= rowSpan.y; i++) {
             if (currentLevel.tiles[truncatedX][i] == 1) {
                 vel.x = 0;
@@ -146,7 +166,7 @@ function moveAndSlide(obj, velocity) {
 
     let truncatedY = floor(intendedY-currentLevel.y);
 
-    if (truncatedY < currentLevel.h) {
+    if ((truncatedY < currentLevel.h) ** (truncatedY >= 0)) {
         for (let i = columnSpan.x; i <= columnSpan.y; i++) {
             if (currentLevel.tiles[i][truncatedY] == 1) {
                 vel.y = 0;
@@ -168,12 +188,6 @@ function moveAndSlide(obj, velocity) {
     return vel;
 }
 
-function instantiateObject(objPrototype, position) { //maybe misuing the word prototype here, idk
-    let obj = Object.create(objPrototype);
-    obj.init(position);
-    objects.push(obj);
-}
-
 async function loadLevels() {
     let levelsJson = await loadJSON("p5js_project/levels.ldtk");
     levelNames = new Map;
@@ -183,11 +197,13 @@ async function loadLevels() {
         let thisLevel = Object.create(level); //naming this weird because of the way I named the tempalte object ;-;
         
         thisLevel.id = i;
-        thisLevel.name = json.identifier;
+        thisLevel.name = json.iid;
         thisLevel.x = json.worldX/16;
         thisLevel.y = json.worldY/16;
         thisLevel.w = json.pxWid/16;
         thisLevel.h = json.pxHei/16;
+
+        "__neighbours"
 
         thisLevel.tiles = []; //without this, all levels reference the same tiles array
         for (let x = 0; x < json.pxWid; x++) {
@@ -198,14 +214,31 @@ async function loadLevels() {
             }
         }
 
+        thisLevel.connectedLevels = [];
+        for (let i = 0; i < json.__neighbours.length; i++) {
+            let connection = json.__neighbours[i];
+            thisLevel.connectedLevels.push(connection.levelIid);
+        }
+
         levels.push(thisLevel);
-        levelNames.set(json.identifier, i);
+        levelNames.set(json.iid, i);
     }
 }
 
 function loadLevel(index) {
     currentLevelId = index;
     currentLevel = levels[index];
+
+    let center = createVector(currentLevel.x+(currentLevel.w/2), currentLevel.y+(currentLevel.h/2));
+    
+    cameraPosition.x = center.x-(viewport.width/32)
+    cameraPosition.y = center.y-(viewport.height/32)
+}
+
+function instantiateObject(objPrototype, position) { //maybe misuing the word prototype here, idk
+    let obj = Object.create(objPrototype);
+    obj.init(position);
+    objects.push(obj);
 }
 
 
@@ -214,29 +247,49 @@ function draw() {
 
     //setup
     viewport.noSmooth();
+    viewport.noStroke();
     viewport.pixelDensity(1);
-    viewport.background(220);
+    viewport.background(255);
     
+    viewport.translate(-cameraPosition.x*16, -cameraPosition.y*16); 
+
+    viewport.fill(220);
+    viewport.rect(currentLevel.x*16, currentLevel.y*16, currentLevel.w*16, currentLevel.h*16)
+
     //object step
-    for (var i = 0; i < objects.length; i++) {
+    for (let i = 0; i < objects.length; i++) {
         objects[i].step();
     }
 
     //draw tiles
-    viewport.translate(-cameraPosition.x*16, -cameraPosition.y*16); 
     for (let y = 0; y < currentLevel.h; y++) {
         for (let x = 0; x < currentLevel.w; x++) {
             if (currentLevel.tiles[x][y] == 1) {
-                viewport.image(imgTiles, x*16, y*16, 16, 16, 0, 0, 16, 16);
+                viewport.image(imgTiles, (x+currentLevel.x)*16, (y+currentLevel.y)*16, 16, 16, 0, 0, 16, 16);
             }
         }
     }
 
     //draw objects
-    for (var i = 0; i < objects.length; i++) {
+    for (let i = 0; i < objects.length; i++) {
         objects[i].draw();
     }
 
+    //fog (not working)
+    viewport.image(imgFog, currentLevel.x*16, currentLevel.y*16, currentLevel.w*16, 16);
+    viewport.resetMatrix();
+    
+    //viewport.translate(currentLevel.x*16, (currentLevel.y-currentLevel.h)*16)
+    //viewport.rotate(PI/2);
+    //viewport.image(imgFog, 0, 0, currentLevel.w*16, 16);
+    
+    //viewport.image(imgFog, currentLevel.x*16, (currentLevel.y*16)-(currentLevel.h*16), currentLevel.w*16, 16);
+    //viewport.rotate(PI/2);
+    //viewport.image(imgFog, (currentLevel.x*16)-(currentLevel.w*16), (currentLevel.y*16)-(currentLevel.h*16), currentLevel.w*16, 16);
+    //viewport.rotate(PI/2);
+    //viewport.image(imgFog, (currentLevel.x*16)-(currentLevel.w*16), currentLevel.y*16, currentLevel.w*16, 16);
+
+    //reset
     viewport.resetMatrix();
 
     //draw game to canvas
