@@ -8,23 +8,44 @@ let viewport;
 let canvasElement;
 let titleElement;
 
+const playerFoot = {
+    isFacingR: true,
+    frame: 0,
+    position:null //for the sake of correct pixel placement, this position is in pixels instead of tiles
+}
+
 const objPlayer = {
     position: null,
     size: null, //used for collision
     velocity: null,
+    
+    isFacingR: true,
+
+    animFeet: null,
 
     init: function(pos) {
         this.position = createVector(pos.x, pos.y);
         this.size = createVector(1, 1);
         this.velocity = createVector(0, 0)
+
+        //animation
+        this.animFeet = [];
+        let foot = Object.create(playerFoot);
+        foot.position = createVector(pos.x*16, pos.y*16)
+        this.animFeet.push(foot);
+
+        foot = Object.create(playerFoot);
+        foot.position = createVector(pos.x*16, pos.y*16)
+        this.animFeet.push(foot);
     },
+
     step: function() {
         //movement
         //TODO: implement angel frames
         //horizontal movement
         let hKey = keyIsDown('d')-keyIsDown('a');
         this.velocity.x = hKey * 0.1;
-        
+
         //vertical movement
         //using w because I can't be bothered to figure out the key code for space
         if (keyIsDown('w')) {
@@ -61,9 +82,48 @@ const objPlayer = {
                 }
             }
         }
+
+        //animation
+        if (hKey != 0) {
+            if (hKey == 1) {
+                this.isFacingR = true;
+            } else {
+                this.isFacingR = false;
+            }
+        }
+
+        let footTargetX = ((this.position.x+0.5)*16)+((-0.5+(1*this.isFacingR))*16)
+        let farthestFoot = 0;
+        let footDistance = 100000;
+        for (let i = 0; i < this.animFeet.length; i++) {
+            let foot = this.animFeet[i];
+            foot.position.y = (this.position.y*16)+(this.size.y*16)
+
+            let distance = abs(foot.position.x-footTargetX);
+            if (distance < footDistance) {
+                footDistance = distance
+            } else {
+                farthestFoot = i;
+            }
+        }
+
+        if (footDistance > 16) {
+            let foot = this.animFeet[farthestFoot];
+            foot.position.x = footTargetX;
+        }
     },
+
     draw: function() {
-        viewport.image(imgPlayer, this.position.x*16, this.position.y*16);
+        if (this.isFacingR) {
+            viewport.image(imgPlayer, this.position.x*16, this.position.y*16, 16, 16, 0, 0, 16, 16);
+        } else {
+            viewport.image(imgPlayer, this.position.x*16, this.position.y*16, 16, 16, 16, 0, 16, 16);
+        }
+
+        for (let i = 0; i < this.animFeet.length; i++) {
+            let foot = this.animFeet[i];
+            viewport.image(imgPlayer, foot.position.x, foot.position.y-8, 8, 8, 0, 16, 8, 8);
+        }
     }
 }
 
@@ -123,7 +183,7 @@ async function setup() {
     cameraPositionOld = createVector(-1, -1);
     
     imgTiles = await loadImage("p5js_project/assets/tiles.png");
-    imgPlayer = await loadImage("p5js_project/assets/player.png");
+    imgPlayer = await loadImage("p5js_project/assets/player2.png");
     imgFogs = [await(loadImage("p5js_project/assets/fog_e.png")), 
                await(loadImage("p5js_project/assets/fog_n.png")), 
                await(loadImage("p5js_project/assets/fog_w.png")), 
@@ -351,6 +411,7 @@ function draw() {
     viewport.image(imgFogs[0], (currentLevel.x+currentLevel.w-1)*16, currentLevel.y*16, 16, currentLevel.h*16);
 
     //borders to hide out of bounds objects and fix flickering on level edges when camera moves
+    //bugged when a room's bound match the size of the screen because the rectangles have 0 width/height and don't draw
     viewport.fill(255);
     viewport.rect(cameraPosition.x*16, cameraPosition.y*16, viewport.width, ((currentLevel.y-cameraPosition.y)*16)+1)
     viewport.rect(cameraPosition.x*16, ((currentLevel.y+currentLevel.h)*16)-1, viewport.width, ((currentLevel.y+(viewport.height/16))-(currentLevel.y+currentLevel.h))*16)
