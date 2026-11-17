@@ -11,3 +11,13 @@ body {
     min-height: 100vh;
     background: #ffffff;
 }
+
+#defaultCanvas0 {
+    float: left;
+}
+
+#levelTitle {
+    text-align: center;
+    color: black;
+    clear: left;
+}

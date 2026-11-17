@@ -45,7 +45,7 @@ const objPlayer = {
             for (let i = 0; i < nextLevels.length; i++) {
                 let connectedLevelIndex = levelNames.get(nextLevels[i])
                 let connectedLevel = levels[connectedLevelIndex];
-                if ((center.x >= connectedLevel.x) && (center.x < connectedLevel.x+currentLevel.w) && (center.y >= connectedLevel.y) && (center.y < connectedLevel.y+currentLevel.h)) {
+                if ((center.x >= connectedLevel.x) && (center.x < connectedLevel.x+connectedLevel.w) && (center.y >= connectedLevel.y) && (center.y < connectedLevel.y+connectedLevel.h)) {
                     loadLevel(connectedLevelIndex);
                     break;
                 }
@@ -97,6 +97,16 @@ async function setup() {
     createCanvas(canvasWidth, canvasHeight);
     canvasElement = document.getElementById("defaultCanvas0");
     canvasElement.setAttribute('style', 'width: ' + str(canvasWidth/scale) + 'px; height: ' + str(canvasHeight/scale) + 'px;')
+    //titleElement = document.getElementsByClassName("levelTitle");
+    //https://stackoverflow.com/questions/46558733/how-to-add-a-h1-inside-a-div-using-javascript
+    
+    const brTag = document.createElement('br');
+    document.body.appendChild(brTag);
+
+    const h1Tag = document.createElement('H1');
+    h1Tag.id = "levelTitle";
+    h1Tag.innerHTML = "Loading...";
+    document.body.appendChild(h1Tag);
 
     await loadLevels();
 
@@ -112,7 +122,7 @@ async function setup() {
                await(loadImage("p5js_project/assets/fog_s.png"))];
 
     loadLevel(0);
-    instantiateObject(objPlayer, createVector(7, 11));
+    instantiateObject(objPlayer, createVector(7, 4));
 
     canvasElement.setAttribute('style', 'width: ' + str(canvasWidth/scale) + 'px; height: ' + str(canvasHeight/scale) + 'px;')
 }
@@ -212,14 +222,12 @@ async function loadLevels() {
         thisLevel.w = json.pxWid/16;
         thisLevel.h = json.pxHei/16;
 
-        "__neighbours"
-
         thisLevel.tiles = []; //without this, all levels reference the same tiles array
-        for (let x = 0; x < json.pxWid; x++) {
+        for (let x = 0; x < thisLevel.w; x++) {
             let row = []
             thisLevel.tiles.push(row)
-            for (let y = 0; y < json.pxHei; y++) {
-                row.push(json.layerInstances[1].intGridCsv[(y*16)+x])
+            for (let y = 0; y < thisLevel.h; y++) {
+                row.push(json.layerInstances[1].intGridCsv[(y*thisLevel.w)+x])
             }
         }
 
