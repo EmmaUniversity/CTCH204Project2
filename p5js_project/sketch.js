@@ -190,8 +190,11 @@ let levels = [];
 let levelNames;
 let currentLevel;
 let currentLevelId = -1;
+let tileMeta = null;
 
 let objects = [];
+
+let tool = 0;
 
 let cameraPosition;
 
@@ -234,6 +237,8 @@ async function setup() {
     instantiateObject(objPlayer, createVector(7, 4));
 
     canvasElement.setAttribute('style', 'width: ' + str(canvasWidth/scale) + 'px; height: ' + str(canvasHeight/scale) + 'px;')
+
+    frameRate(60);
 }
 
 
@@ -291,14 +296,64 @@ function loadLevel(index) {
     currentLevel = levels[index];
     titleElement.innerHTML = currentLevel.title;
 
+    //setup tile meta data array
+    tileMeta = [];
+    for (let x = 0; x < currentLevel.w; x++) {
+        tileMeta.push([]);
+        for (let y = 0; y < currentLevel.h; y++) {
+            tileMeta[x].push(null);
+        }
+    }
+
     let center = createVector(currentLevel.x+(currentLevel.w/2), currentLevel.y+(currentLevel.h/2));
     
     cameraPositionOld = cameraPosition.copy();
     cameraPosition.x = center.x-(viewport.width/32)
     cameraPosition.y = center.y-(viewport.height/32)
-
    
 }
+
+function setupTileMeta() {
+
+    //set up nail heads
+    for (let y = 1; y < currentLevel.h-1; y++) {
+        for (let x = 1; x < currentLevel.w-1; x++) {
+            //orthogonal neighbours in counterclockwise order
+            let neighbours = [];
+            neighbours.push(currentLevel[x+1][y]);
+            neighbours.push(currentLevel[x][y-1]);
+            neighbours.push(currentLevel[x-1][y]);
+            neighbours.push(currentLevel[x][y+1]);
+
+            //direction towards "point" of nail
+            let vector = null;
+            if (neighbours == [1, 0, 0, 0]) {
+                vector = createVector(1, 0)
+            } else if (neighbours == [0, 1, 0, 0]) {
+                vector = createVector(0, -1)
+            } else if (neighbours == [0, 0, 1, 0]) {
+                vector = createVector(-1, 0)
+            } else if (neighbours == [0, 0, 0, 1]) {
+                vector = createVector(0, 1)
+            }
+
+            if (vector != null) {
+                let meta = {
+                    type: "nailHead",
+                    direction: vector 
+                }
+                //putting it in an array because in future tiles might need to have multiple types of metadata
+                tileMeta[x][y] = [meta];
+            }
+        }
+    }
+
+
+
+}
+
+
+
 
 function instantiateObject(objPrototype, position) { //maybe misuing the word prototype here, idk
     let obj = Object.create(objPrototype);
