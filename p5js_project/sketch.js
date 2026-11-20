@@ -304,13 +304,14 @@ function loadLevel(index) {
             tileMeta[x].push(null);
         }
     }
+    setupTileMeta();
 
     let center = createVector(currentLevel.x+(currentLevel.w/2), currentLevel.y+(currentLevel.h/2));
     
     cameraPositionOld = cameraPosition.copy();
     cameraPosition.x = center.x-(viewport.width/32)
     cameraPosition.y = center.y-(viewport.height/32)
-   
+
 }
 
 function setupTileMeta() {
@@ -318,32 +319,35 @@ function setupTileMeta() {
     //set up nail heads
     for (let y = 1; y < currentLevel.h-1; y++) {
         for (let x = 1; x < currentLevel.w-1; x++) {
-            //orthogonal neighbours in counterclockwise order
-            let neighbours = [];
-            neighbours.push(currentLevel[x+1][y]);
-            neighbours.push(currentLevel[x][y-1]);
-            neighbours.push(currentLevel[x-1][y]);
-            neighbours.push(currentLevel[x][y+1]);
+            if (currentLevel.tiles[x][y] == 1) {
+                //orthogonal neighbours in counterclockwise order
+                let neighbours = [];
+                neighbours.push(currentLevel.tiles[x+1][y]);
+                neighbours.push(currentLevel.tiles[x][y-1]);
+                neighbours.push(currentLevel.tiles[x-1][y]);
+                neighbours.push(currentLevel.tiles[x][y+1]);
 
-            //direction towards "point" of nail
-            let vector = null;
-            if (neighbours == [1, 0, 0, 0]) {
-                vector = createVector(1, 0)
-            } else if (neighbours == [0, 1, 0, 0]) {
-                vector = createVector(0, -1)
-            } else if (neighbours == [0, 0, 1, 0]) {
-                vector = createVector(-1, 0)
-            } else if (neighbours == [0, 0, 0, 1]) {
-                vector = createVector(0, 1)
-            }
-
-            if (vector != null) {
-                let meta = {
-                    type: "nailHead",
-                    direction: vector 
+                //direction towards "point" of nail
+                let vector = null;
+                if        ((neighbours[0] == 1) && (neighbours[1] == 0) && (neighbours[2] == 0) && (neighbours[3] == 0)) {
+                    vector = createVector(1, 0)
+                } else if ((neighbours[0] == 0) && (neighbours[1] == 1) && (neighbours[2] == 0) && (neighbours[3] == 0)) {
+                    vector = createVector(0, -1)
+                } else if ((neighbours[0] == 0) && (neighbours[1] == 0) && (neighbours[2] == 1) && (neighbours[3] == 0)) {
+                    vector = createVector(-1, 0)
+                } else if ((neighbours[0] == 0) && (neighbours[1] == 0) && (neighbours[2] == 0) && (neighbours[3] == 1)) {
+                    vector = createVector(0, 1)
                 }
-                //putting it in an array because in future tiles might need to have multiple types of metadata
-                tileMeta[x][y] = [meta];
+
+                //print(neighbours)
+                if (vector != null) {
+                    let meta = {
+                        type: "nailHead",
+                        direction: vector 
+                    }
+                    //putting it in an array because in future tiles might need to have multiple types of metadata
+                    tileMeta[x][y] = [meta];
+                }
             }
         }
     }
@@ -489,7 +493,27 @@ function draw() {
     for (let y = 0; y < currentLevel.h; y++) {
         for (let x = 0; x < currentLevel.w; x++) {
             if (currentLevel.tiles[x][y] == 1) {
-                viewport.image(imgTiles, (x+currentLevel.x)*16, (y+currentLevel.y)*16, 16, 16, 0, 0, 16, 16);
+                //pixel coordinates onto the tile map
+                let tileX = 0
+                let tileY = 0
+                
+                if (tileMeta[x][y] != null) {
+                    for (let i = 0; i < tileMeta[x][y].length; i++) {
+                        let meta = tileMeta[x][y][0];
+                        
+                        if (meta.type == "nailHead") {
+                            tileY += 16;
+                            if (meta.direction.y != 0) {
+                                tileX += 16;
+                            }
+                            if ((meta.direction.y == -1) || (meta.direction.x == 1)) {
+                                tileY += 16;
+                            }
+                        } 
+                    }
+                }
+                
+                viewport.image(imgTiles, (x+currentLevel.x)*16, (y+currentLevel.y)*16, 16, 16, tileX, tileY, 16, 16);
             }
         }
     }
