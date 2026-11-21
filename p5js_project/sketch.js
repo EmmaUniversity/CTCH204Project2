@@ -1,12 +1,5 @@
-//for the sake of resizing the canvas
-const scale = window.devicePixelRatio
-const canvasWidth = 32*18;
-const canvasHeight = 32*18;
-const pixelSize = 2;
 
-let viewport;
-let canvasElement;
-let titleElement;
+// -<>- OBJECTS -<>-
 
 const playerFoot = {
     isFacingR: true,
@@ -170,6 +163,12 @@ const objPlayer = {
 
 
 
+//sprites
+let imgTiles;
+let imgPlayer;
+let imgFogs = [];
+
+//level variables
 const level = {
     id: 0,
     name: "",
@@ -182,10 +181,6 @@ const level = {
     title: ""
 }
 
-let imgTiles;
-let imgPlayer;
-let imgFogs = [];
-
 let levels = [];
 let levelNames;
 let currentLevel;
@@ -194,16 +189,32 @@ let tileMeta = null;
 
 let objects = [];
 
+// 0 = none
+// 1 = hammer
+// 2 = paintbrush
 let tool = 0;
 
 let cameraPosition;
-
 
 //level transition animation
 let cameraPositionOld;
 let transitionAnimationTick = 1;
 let oldLevelPosition;
 let oldLevelSize;
+
+//for the sake of resizing the canvas
+const scale = window.devicePixelRatio
+const canvasWidth = 32*18;
+const canvasHeight = 32*18;
+const pixelSize = 2;
+
+let viewport;
+let canvasElement;
+let titleElement;
+
+
+
+// -<>- SETUP -<>-
 
 async function setup() {
     //rescale the canvas so that it displays at 1 unit = 1 screen pixel
@@ -242,6 +253,8 @@ async function setup() {
 }
 
 
+
+// -<>- LEVELS -<>-
 
 async function loadLevels() {
     let levelsJson = await loadJSON("p5js_project/levels.ldtk");
@@ -352,12 +365,11 @@ function setupTileMeta() {
         }
     }
 
-
-
 }
 
 
 
+// -<>- OBJECT MANGEMENT -<>-
 
 function instantiateObject(objPrototype, position) { //maybe misuing the word prototype here, idk
     let obj = Object.create(objPrototype);
@@ -366,6 +378,8 @@ function instantiateObject(objPrototype, position) { //maybe misuing the word pr
 }
 
 
+
+// -<>- GAME LOGIC -<>-
 
 //this whole function is pretty ugly and repetitive, but I'm not sure what the cleaner what to do it is
 function moveAndSlide(obj, velocity) {
@@ -466,7 +480,16 @@ function objIsGrounded(obj) {
 
 
 
+// -<>- DRAW -<>-
+
 function draw() {
+    //set tools
+    if (keyIsDown('1')) {
+        tool = 1;
+    } else {
+        tool = 0;
+    }
+
     //object logic
     for (let i = 0; i < objects.length; i++) {
         objects[i].step();
@@ -497,19 +520,21 @@ function draw() {
                 let tileX = 0
                 let tileY = 0
                 
-                if (tileMeta[x][y] != null) {
-                    for (let i = 0; i < tileMeta[x][y].length; i++) {
-                        let meta = tileMeta[x][y][0];
-                        
-                        if (meta.type == "nailHead") {
-                            tileY += 16;
-                            if (meta.direction.y != 0) {
-                                tileX += 16;
-                            }
-                            if ((meta.direction.y == -1) || (meta.direction.x == 1)) {
+                if (tool == 1) {
+                    if (tileMeta[x][y] != null) {
+                        for (let i = 0; i < tileMeta[x][y].length; i++) {
+                            let meta = tileMeta[x][y][0];
+
+                            if (meta.type == "nailHead") {
                                 tileY += 16;
-                            }
-                        } 
+                                if (meta.direction.y != 0) {
+                                    tileX += 16;
+                                }
+                                if ((meta.direction.y == -1) || (meta.direction.x == 1)) {
+                                    tileY += 16;
+                                }
+                            } 
+                        }
                     }
                 }
                 
