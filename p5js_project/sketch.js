@@ -13,6 +13,9 @@ const objPlayer = {
     size: null, //used for collision
     velocity: null,
     
+    selectedTile: null,
+    isSelectValid: false,
+
     isFacingR: true,
 
     animFeet: null,
@@ -20,7 +23,9 @@ const objPlayer = {
     init: function(pos) {
         this.position = createVector(pos.x, pos.y);
         this.size = createVector(1, 1);
-        this.velocity = createVector(0, 0)
+        this.velocity = createVector(0, 0);
+
+        this.selectedTile = createVector(0, 0);
 
         //animation
         this.animFeet = [];
@@ -77,6 +82,41 @@ const objPlayer = {
                     break;
                 }
             }
+        }
+
+        //selection
+        this.selectedTile.x = floor((this.position.x+this.isFacingR*2.99)-1)-currentLevel.x;
+        this.selectedTile.y = floor(this.position.y+0.5)-currentLevel.y;
+
+        this.isSelectValid = false;
+        switch (tool) {
+            case 0:
+                //no tool
+
+                break;
+
+            case 1:
+                //hammer
+                print("hamering time zone")
+                if ((this.selectedTile.x >= 1) && (this.selectedTile.x < currentLevel.w-1)) {
+                    if ((this.selectedTile.y >= 1) && (this.selectedTile.y < currentLevel.h-1)) {
+                        if (tileMeta[this.selectedTile.x][this.selectedTile.y] != null) {
+                            for (let i = 0; i < tileMeta[this.selectedTile.x][this.selectedTile.y].length; i++) {
+                                let meta = tileMeta[this.selectedTile.x][this.selectedTile.y][0];
+
+                                if (meta.type == "nailHead") {
+                                    this.isSelectValid = true;
+                                    break;
+                                }
+
+                            }
+
+                        }
+
+                    }
+                }
+
+                break;
         }
 
         //animation
@@ -158,6 +198,10 @@ const objPlayer = {
             let foot = this.animFeet[i];
             viewport.image(imgPlayer, foot.position.x-(8*!foot.isFacingR), foot.position.y-8, 8, 8, 0+(8*!foot.isFacingR)+(foot.frame*16), 16+(8*foot.isFront), 8, 8);
         }
+
+        if (this.isSelectValid) {
+            viewport.image(imgSelection, (this.selectedTile.x+currentLevel.x)*16, (this.selectedTile.y+currentLevel.y)*16);
+        }
     }
 }
 
@@ -167,6 +211,7 @@ const objPlayer = {
 let imgTiles;
 let imgPlayer;
 let imgFogs = [];
+let imgSelection;
 
 //level variables
 const level = {
@@ -223,33 +268,37 @@ async function setup() {
     createCanvas(canvasWidth, canvasHeight);
     canvasElement = document.getElementById("defaultCanvas0");
     canvasElement.setAttribute('style', 'width: ' + str(canvasWidth/scale) + 'px; height: ' + str(canvasHeight/scale) + 'px;')
-    //titleElement = document.getElementsByClassName("levelTitle");
-    //https://stackoverflow.com/questions/46558733/how-to-add-a-h1-inside-a-div-using-javascript
 
+    //level title setup
+    //https://stackoverflow.com/questions/46558733/how-to-add-a-h1-inside-a-div-using-javascript
     titleElement = document.createElement('H1');
     titleElement.id = "levelTitle";
     titleElement.innerHTML = "Loading...";
     document.body.appendChild(titleElement);
 
+    //load levels from json
     await loadLevels();
 
+    //set up camera variables
     viewport = createGraphics(canvasWidth/pixelSize, canvasHeight/pixelSize)
     cameraPosition = createVector(-1, -1);
     cameraPositionOld = createVector(-1, -1);
     
+    //load images
     imgTiles = await loadImage("p5js_project/assets/tiles.png");
     imgPlayer = await loadImage("p5js_project/assets/player2.png");
     imgFogs = [await(loadImage("p5js_project/assets/fog_e.png")), 
                await(loadImage("p5js_project/assets/fog_n.png")), 
                await(loadImage("p5js_project/assets/fog_w.png")), 
                await(loadImage("p5js_project/assets/fog_s.png"))];
+    imgSelection = await loadImage("p5js_project/assets/selection.png");
 
+    //load inital level and player object
     loadLevel(0);
     instantiateObject(objPlayer, createVector(7, 4));
 
+    //resize canvas element
     canvasElement.setAttribute('style', 'width: ' + str(canvasWidth/scale) + 'px; height: ' + str(canvasHeight/scale) + 'px;')
-
-    frameRate(60);
 }
 
 
