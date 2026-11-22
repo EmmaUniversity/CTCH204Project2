@@ -102,7 +102,7 @@ const objPlayer = {
                     if ((this.selectedTile.y >= 1) && (this.selectedTile.y < currentLevel.h-1)) {
                         if (tileMeta[this.selectedTile.x][this.selectedTile.y] != null) {
                             for (let i = 0; i < tileMeta[this.selectedTile.x][this.selectedTile.y].length; i++) {
-                                let meta = tileMeta[this.selectedTile.x][this.selectedTile.y][0];
+                                let meta = tileMeta[this.selectedTile.x][this.selectedTile.y][i];
 
                                 if (meta.type == "nailHead") {
                                     this.isSelectValid = true;
@@ -118,6 +118,34 @@ const objPlayer = {
 
                 break;
         }
+
+
+        //ability
+        if (keyIsDown("j"))
+            switch (tool) {
+                case 0:
+                    //no tool
+
+                    break;
+                
+                case 1:
+                    //hammer
+                    if (this.isSelectValid) {
+                        let nailDirection = null;
+                        
+                        for (let i = 0; i < tileMeta[this.selectedTile.x][this.selectedTile.y].length; i++) {
+                            let meta = tileMeta[this.selectedTile.x][this.selectedTile.y][i];
+
+                            if (meta.type == "nailHead") {
+                                nailDirection = meta.direction;
+                            } 
+                        }
+
+                        hammerTile(createVector(this.selectedTile.x, this.selectedTile.y), nailDirection);
+                    }
+
+        }
+
 
         //animation
         if (hKey != 0) {
@@ -556,7 +584,7 @@ function hammerTile(position, vector) {
         let spanEnd = position.x;
 
         for (let x = position.x; (x < currentLevel.w-1) && (x > 0); x += vector.x) {
-            if (currentLevel.tiles[x-currentLevel.x][y-currentLevel.y] != 0) {
+            if (currentLevel.tiles[x-currentLevel.x][position.y-currentLevel.y] != 0) {
                 //little verbose to save myself from having to write this for loop once for each direction
                 spanStart = min(spanStart, x);
                 spanEnd = max(spanEnd, x);
@@ -617,7 +645,7 @@ function draw() {
                 if (tool == 1) {
                     if (tileMeta[x][y] != null) {
                         for (let i = 0; i < tileMeta[x][y].length; i++) {
-                            let meta = tileMeta[x][y][0];
+                            let meta = tileMeta[x][y][i];
 
                             if (meta.type == "nailHead") {
                                 tileY += 16;
