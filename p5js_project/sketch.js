@@ -317,7 +317,7 @@ function loadLevel(index) {
             tileMeta[x].push(null);
         }
     }
-    setupTileMeta();
+    setupTileMeta(createVector(1, 1), createVector(currentLevel.w-2, currentLevel.h-2));
 
     let center = createVector(currentLevel.x+(currentLevel.w/2), currentLevel.y+(currentLevel.h/2));
     
@@ -327,11 +327,12 @@ function loadLevel(index) {
 
 }
 
-function setupTileMeta() {
+//arguments define the rect within the tile map that get calculated
+function setupTileMeta(postion, size) {
 
     //set up nail heads
-    for (let y = 1; y < currentLevel.h-1; y++) {
-        for (let x = 1; x < currentLevel.w-1; x++) {
+    for (let y = postion.y; y < postion.y+size.y; y++) {
+        for (let x = postion.x; x < postion.x+size.x; x++) {
             if (currentLevel.tiles[x][y] == 1) {
                 //orthogonal neighbours in counterclockwise order
                 let neighbours = [];
@@ -364,6 +365,26 @@ function setupTileMeta() {
             }
         }
     }
+
+}
+
+//x coordinates in tile space not world space
+function shiftTilesRow(spanStart, spanEnd, y, direction) {
+    if (direction == 1) {
+        for (let x = spanEnd; x >= spanStart; x--) {
+            currentLevel.tiles[x+1][y] = currentLevel.tiles[x][y];
+            tileMeta[x+1][y] = tileMeta[x][y];
+        }
+        currentLevel.tiles[spanStart][y] = 0;
+        tileMeta[spanStart][y] = null;
+
+        
+    } else {
+
+    }
+
+    setupTileMeta(createVector(spanStart+direction, y), createVector(1, 1));
+    setupTileMeta(createVector(spanEnd+direction, y), createVector(1, 1));
 
 }
 
@@ -476,6 +497,30 @@ function objIsGrounded(obj) {
     }
 
     return false;
+}
+
+function hammerTile(position, vector) {
+    
+    if (vector.x != 0) {
+        //horizontal nails
+        let spanStart = position.x;
+        let spanEnd = position.x;
+
+        for (let x = position.x; (x < currentLevel.w-1) && (x > 0); x += vector.x) {
+            if (currentLevel.tiles[x-currentLevel.x][y-currentLevel.y] != 0) {
+                //little verbose to save myself from having to write this for loop once for each direction
+                spanStart = min(spanStart, x);
+                spanEnd = max(spanEnd, x);
+            } else {
+                break;
+            }
+        }
+
+
+
+
+    }
+
 }
 
 
