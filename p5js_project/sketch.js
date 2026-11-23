@@ -109,6 +109,7 @@ const objPlayer = {
 
 
         //death
+        //as this is currently implemented, you can jump on the sides of spikes as long as your center doesn't cross into their tile
         let centerTileMeta = tileMeta[floor(center.x)-currentLevel.x][floor(center.y)-currentLevel.y];
         if (centerTileMeta != null) {
             for (let i = 0; i < centerTileMeta.length; i++) {
