@@ -647,8 +647,9 @@ function draw() {
     //camera animation
     //maps 0 to 1 on a linear curve to 0 to 1 on a cos curve where 0 is PI and 1 is 0/2PI
     let smoothTransition = (-cos(transitionAnimationTick*PI)/2)+0.5
-    viewport.translate(-(lerp(cameraPositionOld.x, cameraPosition.x, smoothTransition))*16, 
-                       -(lerp(cameraPositionOld.y, cameraPosition.y, smoothTransition))*16); 
+    let currentCamera = createVector((lerp(cameraPositionOld.x, cameraPosition.x, smoothTransition)),
+                                     (lerp(cameraPositionOld.y, cameraPosition.y, smoothTransition)));
+    viewport.translate(-currentCamera.x*16, -currentCamera.y*16); 
 
     transitionAnimationTick = min(transitionAnimationTick+0.025, 1);
 
@@ -701,10 +702,10 @@ function draw() {
     //borders to hide out of bounds objects and fix flickering on level edges when camera moves
     //bugged when a room's bound match the size of the screen because the rectangles have 0 width/height and don't draw
     viewport.fill(255);
-    viewport.rect(cameraPosition.x*16, cameraPosition.y*16, viewport.width, ((currentLevel.y-cameraPosition.y)*16)+1)
-    viewport.rect(cameraPosition.x*16, ((currentLevel.y+currentLevel.h)*16)-1, viewport.width, ((currentLevel.y+(viewport.height/16))-(currentLevel.y+currentLevel.h))*16)
-    viewport.rect(cameraPosition.x*16, cameraPosition.y*16, ((currentLevel.x-cameraPosition.x)*16)+1, viewport.height);
-    viewport.rect(((currentLevel.x+currentLevel.w)*16)-1, cameraPosition.y*16, ((currentLevel.x+(viewport.width/16))-(currentLevel.x+currentLevel.w))*16, viewport.height);
+    viewport.rect(currentCamera.x*16, currentCamera.y*16, viewport.width, ((currentLevel.y-currentCamera.y)*16)+1)
+    viewport.rect(currentCamera.x*16, ((currentLevel.y+currentLevel.h)*16)-1, viewport.width, (((currentCamera.y+(viewport.height/16))-(currentLevel.y+currentLevel.h))*16)+2)
+    viewport.rect(currentCamera.x*16, currentCamera.y*16, ((currentLevel.x-currentCamera.x)*16)+1, viewport.height);
+    viewport.rect(((currentLevel.x+currentLevel.w)*16)-1, currentCamera.y*16, (((currentCamera.x+(viewport.width/16))-(currentLevel.x+currentLevel.w))*16)+2, viewport.height);
 
     if (transitionAnimationTick < 1) {
         viewport.fill(255-(max(lerp(80, 0, transitionAnimationTick*2), 0)));
