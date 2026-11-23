@@ -97,7 +97,6 @@ const objPlayer = {
 
             case 1:
                 //hammer
-                print("hamering time zone")
                 if ((this.selectedTile.x >= 1) && (this.selectedTile.x < currentLevel.w-1)) {
                     if ((this.selectedTile.y >= 1) && (this.selectedTile.y < currentLevel.h-1)) {
                         if (tileMeta[this.selectedTile.x][this.selectedTile.y] != null) {
@@ -119,9 +118,8 @@ const objPlayer = {
                 break;
         }
 
-
         //ability
-        if (keyIsDown("j"))
+        if (keyIsDown("Shift")) {
             switch (tool) {
                 case 0:
                     //no tool
@@ -143,7 +141,8 @@ const objPlayer = {
 
                         hammerTile(createVector(this.selectedTile.x, this.selectedTile.y), nailDirection);
                     }
-
+            
+            }
         }
 
 
@@ -474,7 +473,7 @@ function shiftTilesRow(spanStart, spanEnd, y, direction) {
             tileMeta[spanEnd-1][y] = null;
         }
     }
-    
+
 }
 
 
