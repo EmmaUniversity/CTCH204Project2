@@ -568,6 +568,38 @@ function shiftTilesRow(spanStart, spanEnd, y, direction) {
 
 }
 
+function shiftTilesColumn(spanStart, spanEnd, x, direction) {
+    if (direction == 1) {
+        //hammer down
+        
+        for (let y = spanEnd; y >= spanStart; y--) {
+            tiles[x][y+1] = tiles[x][y];
+            tileMeta[x][y+1] = tileMeta[x][y];
+        }
+        tiles[x][spanStart] = 0;
+        tileMeta[x][spanStart] = null;
+
+        if ((tiles[x+1][spanStart+1] == 1) || (tiles[x-1][spanStart+1] == 1)) {
+            tileMeta[x][spanStart+1] = null;
+        }
+    } else {
+        //hammer up
+
+        for (let y = spanStart; y <= spanEnd; y++) {
+            tiles[x][y-1] = tiles[x][y];
+            tileMeta[x][y-1] = tileMeta[x][y];
+        }
+        tiles[x][spanEnd] = 0;
+        tileMeta[x][spanEnd] = null;
+
+        if ((tiles[x+1][spanEnd-1] == 1) || (tiles[x-1][spanEnd-1] == 1)) {
+            tileMeta[x][spanEnd-1] = null;
+        }
+
+    }
+
+}
+
 
 
 // -<>- OBJECT MANGEMENT -<>-
@@ -696,8 +728,26 @@ function hammerTile(position, vector) {
             }
         }
 
-        shiftTilesRow(spanStart, spanEnd, position.y, vector.x)
+        shiftTilesRow(spanStart, spanEnd, position.y, vector.x);
 
+    }
+
+    if (vector.y != 0) {
+        //vertical nails
+        let spanStart = position.y;
+        let spanEnd = position.y;
+
+        for (let y = position.y; (y < currentLevel.h-1) && (y > 0); y += vector.y) {
+            if (tiles[position.x][y] != 0) {
+                //little verbose to save myself from having to write this for loop once for each direction
+                spanStart = min(spanStart, y);
+                spanEnd = max(spanEnd, y);
+            } else {
+                break;
+            }
+        }
+
+        shiftTilesColumn(spanStart, spanEnd, position.x, vector.y);
     }
 
 }
