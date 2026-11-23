@@ -16,12 +16,92 @@
 	"toc": [{
 		"identifier": "PlayerStart",
 		"instances": [],
-		"instancesData": [{ "iids": {
-			"worldIid": "57d22330-bde0-11f1-abd0-c5d35828a203",
-			"levelIid": "57d27150-bde0-11f1-abd0-41a997ffdd46",
-			"layerIid": "e8546420-bde0-11f1-abd0-ada750ae1bb1",
-			"entityIid": "6d965030-bde0-11f1-abd0-099a443b7e87"
-		}, "worldX": 120, "worldY": 72, "widPx": 16, "heiPx": 16, "fields" : {} }]
+		"instancesData": [
+			{ "iids": {
+				"worldIid": "57d22330-bde0-11f1-abd0-c5d35828a203",
+				"levelIid": "57d27150-bde0-11f1-abd0-41a997ffdd46",
+				"layerIid": "e8546420-bde0-11f1-abd0-ada750ae1bb1",
+				"entityIid": "6d965030-bde0-11f1-abd0-099a443b7e87"
+			}, "worldX": 120, "worldY": 88, "widPx": 16, "heiPx": 16, "fields" : {} },
+			{ "iids": {
+				"worldIid": "57d22330-bde0-11f1-abd0-c5d35828a203",
+				"levelIid": "89c7b870-bde0-11f1-abd0-4783d9294a54",
+				"layerIid": "89c7b871-bde0-11f1-abd0-374c81dc3108",
+				"entityIid": "67f07dc0-e4f0-11f1-a171-f31672cc5811"
+			}, "worldX": 280, "worldY": 104, "widPx": 16, "heiPx": 16, "fields" : {} },
+			{ "iids": {
+				"worldIid": "57d22330-bde0-11f1-abd0-c5d35828a203",
+				"levelIid": "9faf35c0-bde0-11f1-893c-5782cd80dbc4",
+				"layerIid": "9fafd200-bde0-11f1-893c-2565c361ca20",
+				"entityIid": "6ac34cd0-e4f0-11f1-a171-0bb757a98581"
+			}, "worldX": 536, "worldY": -40, "widPx": 16, "heiPx": 16, "fields" : {} },
+			{ "iids": {
+				"worldIid": "57d22330-bde0-11f1-abd0-c5d35828a203",
+				"levelIid": "e6d922d0-bde0-11f1-893c-e79142d9aa3a",
+				"layerIid": "e6d949e0-bde0-11f1-893c-4d016e325f71",
+				"entityIid": "6f23c0c0-e4f0-11f1-a171-3fb635a74fa0"
+			}, "worldX": 696, "worldY": -328, "widPx": 16, "heiPx": 16, "fields" : {} },
+			{ "iids": {
+				"worldIid": "57d22330-bde0-11f1-abd0-c5d35828a203",
+				"levelIid": "23afc830-bde0-11f1-893c-c51723315fed",
+				"layerIid": "23afc831-bde0-11f1-893c-117b6a1192e0",
+				"entityIid": "7736b560-e4f0-11f1-a171-79ed08ac94e9"
+			}, "worldX": 968, "worldY": -200, "widPx": 16, "heiPx": 16, "fields" : {} },
+			{ "iids": {
+				"worldIid": "57d22330-bde0-11f1-abd0-c5d35828a203",
+				"levelIid": "9577e510-bde0-11f1-893c-37b9cfd13599",
+				"layerIid": "95780c20-bde0-11f1-893c-8fda50894b95",
+				"entityIid": "88943440-e4f0-11f1-a171-19359026a588"
+			}, "worldX": 1272, "worldY": -152, "widPx": 16, "heiPx": 16, "fields" : {} },
+			{ "iids": {
+				"worldIid": "57d22330-bde0-11f1-abd0-c5d35828a203",
+				"levelIid": "e3b1d5b0-bde0-11f1-893c-3d41ebdae92e",
+				"layerIid": "e3b1fcc0-bde0-11f1-893c-83c41c7a0b75",
+				"entityIid": "8d748690-e4f0-11f1-a171-c3e7eb81c864"
+			}, "worldX": 1560, "worldY": -120, "widPx": 16, "heiPx": 16, "fields" : {} },
+			{ "iids": {
+				"worldIid": "57d22330-bde0-11f1-abd0-c5d35828a203",
+				"levelIid": "494d5700-bde0-11f1-893c-0100b25b9342",
+				"layerIid": "494da520-bde0-11f1-893c-8dd94489568b",
+				"entityIid": "9277a320-e4f0-11f1-a171-8fdec102e8f6"
+			}, "worldX": 1432, "worldY": 40, "widPx": 16, "heiPx": 16, "fields" : {} },
+			{ "iids": {
+				"worldIid": "57d22330-bde0-11f1-abd0-c5d35828a203",
+				"levelIid": "508be4a0-bde0-11f1-893c-3f0966294dc7",
+				"layerIid": "508c0bb0-bde0-11f1-893c-5bc615837edd",
+				"entityIid": "965ec860-e4f0-11f1-a171-03e4e37f157b"
+			}, "worldX": 1432, "worldY": 440, "widPx": 16, "heiPx": 16, "fields" : {} },
+			{ "iids": {
+				"worldIid": "57d22330-bde0-11f1-abd0-c5d35828a203",
+				"levelIid": "1182d8d0-e4f0-11f1-bedc-754b58f7f60f",
+				"layerIid": "1182ffe0-e4f0-11f1-bedc-ff61e07b0a33",
+				"entityIid": "997afc80-e4f0-11f1-a171-5fe2a783e88c"
+			}, "worldX": 1544, "worldY": 456, "widPx": 16, "heiPx": 16, "fields" : {} },
+			{ "iids": {
+				"worldIid": "57d22330-bde0-11f1-abd0-c5d35828a203",
+				"levelIid": "83baf590-e4f0-11f1-bedc-f30ee9e213b5",
+				"layerIid": "83bb1ca0-e4f0-11f1-bedc-1f24c2182f6a",
+				"entityIid": "aa2ccab0-e4f0-11f1-a171-4f4943653475"
+			}, "worldX": 1784, "worldY": 360, "widPx": 16, "heiPx": 16, "fields" : {} },
+			{ "iids": {
+				"worldIid": "57d22330-bde0-11f1-abd0-c5d35828a203",
+				"levelIid": "ce73fcd0-e4f0-11f1-bedc-617804f60a4f",
+				"layerIid": "ce7423e0-e4f0-11f1-bedc-0dbf0549165d",
+				"entityIid": "9e32b830-e4f0-11f1-a171-051866e132b2"
+			}, "worldX": 1896, "worldY": 104, "widPx": 16, "heiPx": 16, "fields" : {} },
+			{ "iids": {
+				"worldIid": "57d22330-bde0-11f1-abd0-c5d35828a203",
+				"levelIid": "57fa7060-e4f0-11f1-bedc-c5fffb64962b",
+				"layerIid": "57fabe80-e4f0-11f1-bedc-61e9ea963317",
+				"entityIid": "a09d4f90-e4f0-11f1-a171-27667f42129f"
+			}, "worldX": 1800, "worldY": -24, "widPx": 16, "heiPx": 16, "fields" : {} },
+			{ "iids": {
+				"worldIid": "57d22330-bde0-11f1-abd0-c5d35828a203",
+				"levelIid": "f26a6b50-e4f0-11f1-bedc-e19a8c906df9",
+				"layerIid": "f26a9260-e4f0-11f1-bedc-37f623f97cb2",
+				"entityIid": "7bfb1b40-e4f0-11f1-a171-ab6a2d9c4180"
+			}, "worldX": 488, "worldY": -328, "widPx": 16, "heiPx": 16, "fields" : {} }
+		]
 	}],
 	"worldLayout": "Free",
 	"worldGridWidth": 256,
@@ -246,7 +326,7 @@
 					"entityInstances": [
 						{
 							"__identifier": "PlayerStart",
-							"__grid": [7,4],
+							"__grid": [7,5],
 							"__pivot": [0.5,0.5],
 							"__tags": [],
 							"__tile": null,
@@ -255,10 +335,10 @@
 							"width": 16,
 							"height": 16,
 							"defUid": 2,
-							"px": [120,72],
+							"px": [120,88],
 							"fieldInstances": [],
 							"__worldX": 120,
-							"__worldY": 72
+							"__worldY": 88
 						}
 					]
 				},
@@ -342,7 +422,24 @@
 					"seed": 6040509,
 					"overrideTilesetUid": null,
 					"gridTiles": [],
-					"entityInstances": []
+					"entityInstances": [
+						{
+							"__identifier": "PlayerStart",
+							"__grid": [2,15],
+							"__pivot": [0.5,0.5],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#BE4A2F",
+							"iid": "67f07dc0-e4f0-11f1-a171-f31672cc5811",
+							"width": 16,
+							"height": 16,
+							"defUid": 2,
+							"px": [40,248],
+							"fieldInstances": [],
+							"__worldX": 280,
+							"__worldY": 104
+						}
+					]
 				},
 				{
 					"__identifier": "Collision",
@@ -428,7 +525,24 @@
 					"seed": 446601,
 					"overrideTilesetUid": null,
 					"gridTiles": [],
-					"entityInstances": []
+					"entityInstances": [
+						{
+							"__identifier": "PlayerStart",
+							"__grid": [2,16],
+							"__pivot": [0.5,0.5],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#BE4A2F",
+							"iid": "6ac34cd0-e4f0-11f1-a171-0bb757a98581",
+							"width": 16,
+							"height": 16,
+							"defUid": 2,
+							"px": [40,264],
+							"fieldInstances": [],
+							"__worldX": 536,
+							"__worldY": -40
+						}
+					]
 				},
 				{
 					"__identifier": "Collision",
@@ -513,7 +627,24 @@
 					"seed": 5001969,
 					"overrideTilesetUid": null,
 					"gridTiles": [],
-					"entityInstances": []
+					"entityInstances": [
+						{
+							"__identifier": "PlayerStart",
+							"__grid": [10,8],
+							"__pivot": [0.5,0.5],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#BE4A2F",
+							"iid": "6f23c0c0-e4f0-11f1-a171-3fb635a74fa0",
+							"width": 16,
+							"height": 16,
+							"defUid": 2,
+							"px": [168,136],
+							"fieldInstances": [],
+							"__worldX": 696,
+							"__worldY": -328
+						}
+					]
 				},
 				{
 					"__identifier": "Collision",
@@ -568,9 +699,9 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "Title", "__type": "String", "__value": "Press R to Restart", "__tile": null, "defUid": 13, "realEditorValues": [{
+			"fieldInstances": [{ "__identifier": "Title", "__type": "String", "__value": "Gate", "__tile": null, "defUid": 13, "realEditorValues": [{
 				"id": "V_String",
-				"params": ["Press R to Restart"]
+				"params": ["Gate"]
 			}] }],
 			"layerInstances": [
 				{
@@ -596,7 +727,24 @@
 					"seed": 1682226,
 					"overrideTilesetUid": null,
 					"gridTiles": [],
-					"entityInstances": []
+					"entityInstances": [
+						{
+							"__identifier": "PlayerStart",
+							"__grid": [12,12],
+							"__pivot": [0.5,0.5],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#BE4A2F",
+							"iid": "7736b560-e4f0-11f1-a171-79ed08ac94e9",
+							"width": 16,
+							"height": 16,
+							"defUid": 2,
+							"px": [200,200],
+							"fieldInstances": [],
+							"__worldX": 968,
+							"__worldY": -200
+						}
+					]
 				},
 				{
 					"__identifier": "Collision",
@@ -683,7 +831,24 @@
 					"seed": 4852910,
 					"overrideTilesetUid": null,
 					"gridTiles": [],
-					"entityInstances": []
+					"entityInstances": [
+						{
+							"__identifier": "PlayerStart",
+							"__grid": [13,9],
+							"__pivot": [0.5,0.5],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#BE4A2F",
+							"iid": "88943440-e4f0-11f1-a171-19359026a588",
+							"width": 16,
+							"height": 16,
+							"defUid": 2,
+							"px": [216,152],
+							"fieldInstances": [],
+							"__worldX": 1272,
+							"__worldY": -152
+						}
+					]
 				},
 				{
 					"__identifier": "Collision",
@@ -707,7 +872,7 @@
 						1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,0,0,
 						0,0,0,0,0,0,0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,1,0,0,0,0,1,
 						1,0,0,0,1,0,0,0,0,1,1,0,0,0,0,1,1,0,0,0,1,0,0,0,0,1,1,0,0,0,0,1,1,0,0,
-						0,1,1,1,0,0,1,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,
+						0,1,0,0,0,0,1,0,0,0,1,1,1,1,0,0,0,1,1,1,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,
 						0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
 						1
 					],
@@ -767,7 +932,24 @@
 					"seed": 3048118,
 					"overrideTilesetUid": null,
 					"gridTiles": [],
-					"entityInstances": []
+					"entityInstances": [
+						{
+							"__identifier": "PlayerStart",
+							"__grid": [15,14],
+							"__pivot": [0.5,0.5],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#BE4A2F",
+							"iid": "8d748690-e4f0-11f1-a171-c3e7eb81c864",
+							"width": 16,
+							"height": 16,
+							"defUid": 2,
+							"px": [248,232],
+							"fieldInstances": [],
+							"__worldX": 1560,
+							"__worldY": -120
+						}
+					]
 				},
 				{
 					"__identifier": "Collision",
@@ -851,7 +1033,24 @@
 					"seed": 523074,
 					"overrideTilesetUid": null,
 					"gridTiles": [],
-					"entityInstances": []
+					"entityInstances": [
+						{
+							"__identifier": "PlayerStart",
+							"__grid": [5,8],
+							"__pivot": [0.5,0.5],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#BE4A2F",
+							"iid": "9277a320-e4f0-11f1-a171-8fdec102e8f6",
+							"width": 16,
+							"height": 16,
+							"defUid": 2,
+							"px": [88,136],
+							"fieldInstances": [],
+							"__worldX": 1432,
+							"__worldY": 40
+						}
+					]
 				},
 				{
 					"__identifier": "Collision",
@@ -935,7 +1134,24 @@
 					"seed": 1552413,
 					"overrideTilesetUid": null,
 					"gridTiles": [],
-					"entityInstances": []
+					"entityInstances": [
+						{
+							"__identifier": "PlayerStart",
+							"__grid": [5,15],
+							"__pivot": [0.5,0.5],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#BE4A2F",
+							"iid": "965ec860-e4f0-11f1-a171-03e4e37f157b",
+							"width": 16,
+							"height": 16,
+							"defUid": 2,
+							"px": [88,248],
+							"fieldInstances": [],
+							"__worldX": 1432,
+							"__worldY": 440
+						}
+					]
 				},
 				{
 					"__identifier": "Collision",
@@ -1019,7 +1235,24 @@
 					"seed": 7963144,
 					"overrideTilesetUid": null,
 					"gridTiles": [],
-					"entityInstances": []
+					"entityInstances": [
+						{
+							"__identifier": "PlayerStart",
+							"__grid": [1,11],
+							"__pivot": [0.5,0.5],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#BE4A2F",
+							"iid": "997afc80-e4f0-11f1-a171-5fe2a783e88c",
+							"width": 16,
+							"height": 16,
+							"defUid": 2,
+							"px": [24,184],
+							"fieldInstances": [],
+							"__worldX": 1544,
+							"__worldY": 456
+						}
+					]
 				},
 				{
 					"__identifier": "Collision",
@@ -1103,7 +1336,24 @@
 					"seed": 1178819,
 					"overrideTilesetUid": null,
 					"gridTiles": [],
-					"entityInstances": []
+					"entityInstances": [
+						{
+							"__identifier": "PlayerStart",
+							"__grid": [2,14],
+							"__pivot": [0.5,0.5],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#BE4A2F",
+							"iid": "aa2ccab0-e4f0-11f1-a171-4f4943653475",
+							"width": 16,
+							"height": 16,
+							"defUid": 2,
+							"px": [40,232],
+							"fieldInstances": [],
+							"__worldX": 1784,
+							"__worldY": 360
+						}
+					]
 				},
 				{
 					"__identifier": "Collision",
@@ -1126,7 +1376,7 @@
 					"intGridCsv": [
 						1,1,1,1,1,1,0,0,0,1,1,1,1,1,1,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,0,0,
 						0,0,0,0,1,1,1,0,0,0,1,1,1,1,1,1,0,0,0,1,1,0,0,0,1,1,0,0,1,1,0,0,0,0,1,
-						1,0,1,1,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,1,1,0,0,0,0,1,1,1,0,1,1,1,1,1,1,
+						1,0,1,1,0,0,0,0,0,1,1,0,0,1,1,0,0,0,0,1,1,0,0,0,0,1,1,1,0,1,1,1,1,1,1,
 						1,1,1,0,1,0,0,1,1,1,1,0,0,0,1,0,0,0,1,1,1,0,1,1,1,0,0,0,0,1,1,0,1,1,1,
 						0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1
 					],
@@ -1186,7 +1436,24 @@
 					"seed": 3151553,
 					"overrideTilesetUid": null,
 					"gridTiles": [],
-					"entityInstances": []
+					"entityInstances": [
+						{
+							"__identifier": "PlayerStart",
+							"__grid": [4,14],
+							"__pivot": [0.5,0.5],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#BE4A2F",
+							"iid": "9e32b830-e4f0-11f1-a171-051866e132b2",
+							"width": 16,
+							"height": 16,
+							"defUid": 2,
+							"px": [72,232],
+							"fieldInstances": [],
+							"__worldX": 1896,
+							"__worldY": 104
+						}
+					]
 				},
 				{
 					"__identifier": "Collision",
@@ -1242,9 +1509,9 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "Title", "__type": "String", "__value": "Stairs", "__tile": null, "defUid": 13, "realEditorValues": [{
+			"fieldInstances": [{ "__identifier": "Title", "__type": "String", "__value": "Press R to Restart", "__tile": null, "defUid": 13, "realEditorValues": [{
 				"id": "V_String",
-				"params": ["Stairs"]
+				"params": ["Press R to Restart"]
 			}] }],
 			"layerInstances": [
 				{
@@ -1270,7 +1537,24 @@
 					"seed": 4123400,
 					"overrideTilesetUid": null,
 					"gridTiles": [],
-					"entityInstances": []
+					"entityInstances": [
+						{
+							"__identifier": "PlayerStart",
+							"__grid": [12,13],
+							"__pivot": [0.5,0.5],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#BE4A2F",
+							"iid": "a09d4f90-e4f0-11f1-a171-27667f42129f",
+							"width": 16,
+							"height": 16,
+							"defUid": 2,
+							"px": [200,216],
+							"fieldInstances": [],
+							"__worldX": 1800,
+							"__worldY": -24
+						}
+					]
 				},
 				{
 					"__identifier": "Collision",
@@ -1355,7 +1639,24 @@
 					"seed": 4321619,
 					"overrideTilesetUid": null,
 					"gridTiles": [],
-					"entityInstances": []
+					"entityInstances": [
+						{
+							"__identifier": "PlayerStart",
+							"__grid": [13,14],
+							"__pivot": [0.5,0.5],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#BE4A2F",
+							"iid": "7bfb1b40-e4f0-11f1-a171-ab6a2d9c4180",
+							"width": 16,
+							"height": 16,
+							"defUid": 2,
+							"px": [216,232],
+							"fieldInstances": [],
+							"__worldX": 488,
+							"__worldY": -328
+						}
+					]
 				},
 				{
 					"__identifier": "Collision",

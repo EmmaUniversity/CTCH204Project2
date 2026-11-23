@@ -46,6 +46,18 @@ const objPlayer = {
             return;
         }
         
+        //restarts every frame as long as you're holding r which is janky, but I don't think causes any actual problems
+        if (keyIsDown('r')) {
+            restartLevel();
+
+            for (let i = 0; i < this.animFeet.length; i++) {
+                let foot = this.animFeet[i];
+                foot.position.x = this.position.x*16;
+                foot.position.y = this.position.y*16;
+            }
+        }
+
+
         //movement
         //TODO: implement angel frames
         //horizontal movement
@@ -90,7 +102,8 @@ const objPlayer = {
             }
         }
 
-        //selection
+
+        //tile selection
         if (keyIsDown('w')) {
             //upward selection
             this.selectedTile.x = floor(this.position.x+0.5)-currentLevel.x;
@@ -134,6 +147,7 @@ const objPlayer = {
 
                 break;
         }
+
 
         //ability
         if (keyIsDown("Shift")) {
@@ -265,6 +279,7 @@ const level = {
     y: 0,
     w: 0,
     h: 0,
+    restartPosition: null,
     connectedLevels: [],
     tiles: [],
     title: ""
@@ -274,7 +289,9 @@ let levels = [];
 let levelNames;
 let currentLevel;
 let currentLevelId = -1;
+
 let tileMeta = null;
+let tiles = null;
 
 let objects = [];
 
@@ -360,6 +377,7 @@ async function loadLevels() {
         let json = levelsJson.levels[i];
         let thisLevel = Object.create(level); //naming this weird because of the way I named the tempalte object ;-;
         
+        //level properties
         thisLevel.id = i;
         thisLevel.name = json.iid;
         thisLevel.x = json.worldX/16;
@@ -367,21 +385,44 @@ async function loadLevels() {
         thisLevel.w = json.pxWid/16;
         thisLevel.h = json.pxHei/16;
 
+        //level contents
         thisLevel.tiles = []; //without this, all levels reference the same tiles array
-        for (let x = 0; x < thisLevel.w; x++) {
-            let row = []
-            thisLevel.tiles.push(row)
-            for (let y = 0; y < thisLevel.h; y++) {
-                row.push(json.layerInstances[1].intGridCsv[(y*thisLevel.w)+x])
+        for (let i = 0; i < json.layerInstances.length; i++) {
+            let layer = json.layerInstances[i];
+            if (layer.__identifier == "Collision") {
+                //tiles
+
+                for (let x = 0; x < thisLevel.w; x++) {
+                    let row = []
+                    thisLevel.tiles.push(row)
+                    for (let y = 0; y < thisLevel.h; y++) {
+                        //using json.layerInstances[1] here might cause an issue
+                        row.push(layer.intGridCsv[(y*thisLevel.w)+x])
+                    }
+                }
+
+            } else if (layer.__identifier == "Entities"){
+                //level restart positions
+                //maybe this should have been a field instead of an entity?
+
+                for (let j = 0; j < layer.entityInstances.length; j++) {
+                    let entity = layer.entityInstances[j];
+
+                    if (entity.__identifier == "PlayerStart") {
+                        thisLevel.restartPosition = createVector(entity.__worldX/16, entity.__worldY/16);
+                    }
+                }
             }
         }
 
+        //level connections
         thisLevel.connectedLevels = [];
         for (let i = 0; i < json.__neighbours.length; i++) {
             let connection = json.__neighbours[i];
             thisLevel.connectedLevels.push(connection.levelIid);
         }
 
+        //level title
         for (let i = 0; i < json.fieldInstances.length; i++) {
             let fieldInstance = json.fieldInstances[i];
             if (fieldInstance.__identifier == "Title") {
@@ -389,6 +430,7 @@ async function loadLevels() {
             }
         }
 
+        //add level to arrays
         levels.push(thisLevel);
         levelNames.set(json.iid, i);
     }
@@ -409,12 +451,15 @@ function loadLevel(index) {
     currentLevel = levels[index];
     titleElement.innerHTML = currentLevel.title;
 
-    //setup tile meta data array
+    //setup tiles and tile meta 2d arrays
     tileMeta = [];
+    tiles = [];
     for (let x = 0; x < currentLevel.w; x++) {
         tileMeta.push([]);
+        tiles.push([]);
         for (let y = 0; y < currentLevel.h; y++) {
             tileMeta[x].push(null);
+            tiles[x].push(currentLevel.tiles[x][y]);
         }
     }
     setupTileMeta(createVector(1, 1), createVector(currentLevel.w-2, currentLevel.h-2));
@@ -427,19 +472,42 @@ function loadLevel(index) {
 
 }
 
+//currently every level has only a single reset position, which is a problem since some levels have multiple entrances
+//  this can result in sequence breaking. A better appraoch, if I had the time, would be a checkpoint system where your
+//  reset position is set to the first checkpoint you reach after entering a level
+function restartLevel() {
+    //reset tiles
+    tileMeta = [];
+    tiles = [];
+    for (let x = 0; x < currentLevel.w; x++) {
+        tileMeta.push([]);
+        tiles.push([]);
+        for (let y = 0; y < currentLevel.h; y++) {
+            tileMeta[x].push(null);
+            tiles[x].push(currentLevel.tiles[x][y]);
+        }
+    }
+    setupTileMeta(createVector(1, 1), createVector(currentLevel.w-2, currentLevel.h-2));
+
+    //move player
+    let playerObject = objects[0] //assuming the player is the first object could cause problems if I keep working on this object, but for now, it's probably fine
+    playerObject.position.x = currentLevel.restartPosition.x;
+    playerObject.position.y = currentLevel.restartPosition.y;
+}
+
 //arguments define the rect within the tile map that get calculated
 function setupTileMeta(postion, size) {
 
     //set up nail heads
     for (let y = postion.y; y < postion.y+size.y; y++) {
         for (let x = postion.x; x < postion.x+size.x; x++) {
-            if (currentLevel.tiles[x][y] == 1) {
+            if (tiles[x][y] == 1) {
                 //orthogonal neighbours in counterclockwise order
                 let neighbours = [];
-                neighbours.push(currentLevel.tiles[x+1][y]);
-                neighbours.push(currentLevel.tiles[x][y-1]);
-                neighbours.push(currentLevel.tiles[x-1][y]);
-                neighbours.push(currentLevel.tiles[x][y+1]);
+                neighbours.push(tiles[x+1][y]);
+                neighbours.push(tiles[x][y-1]);
+                neighbours.push(tiles[x-1][y]);
+                neighbours.push(tiles[x][y+1]);
 
                 //direction towards "point" of nail
                 let vector = null;
@@ -474,26 +542,26 @@ function shiftTilesRow(spanStart, spanEnd, y, direction) {
         //hammer right
         
         for (let x = spanEnd; x >= spanStart; x--) {
-            currentLevel.tiles[x+1][y] = currentLevel.tiles[x][y];
+            tiles[x+1][y] = tiles[x][y];
             tileMeta[x+1][y] = tileMeta[x][y];
         }
-        currentLevel.tiles[spanStart][y] = 0;
+        tiles[spanStart][y] = 0;
         tileMeta[spanStart][y] = null;
 
-        if ((currentLevel.tiles[spanStart+1][y+1] == 1) || (currentLevel.tiles[spanStart+1][y-1] == 1)) {
+        if ((tiles[spanStart+1][y+1] == 1) || (tiles[spanStart+1][y-1] == 1)) {
             tileMeta[spanStart+1][y] = null;
         }
     } else {
         //hammer left
 
         for (let x = spanStart; x <= spanEnd; x++) {
-            currentLevel.tiles[x-1][y] = currentLevel.tiles[x][y];
+            tiles[x-1][y] = tiles[x][y];
             tileMeta[x-1][y] = tileMeta[x][y];
         }
-        currentLevel.tiles[spanEnd][y] = 0;
+        tiles[spanEnd][y] = 0;
         tileMeta[spanEnd][y] = null;
 
-        if ((currentLevel.tiles[spanEnd-1][y+1] == 1) || (currentLevel.tiles[spanEnd-1][y-1] == 1)) {
+        if ((tiles[spanEnd-1][y+1] == 1) || (tiles[spanEnd-1][y-1] == 1)) {
             tileMeta[spanEnd-1][y] = null;
         }
     }
@@ -538,7 +606,7 @@ function moveAndSlide(obj, velocity) {
     //check for any collisions
     if ((truncatedX < currentLevel.w) && (truncatedX >= 0)) {
         for (let i = rowSpan.x; i <= rowSpan.y; i++) {
-            if (currentLevel.tiles[truncatedX][i] == 1) {
+            if (tiles[truncatedX][i] == 1) {
                 vel.x = 0;
                 break;
             }
@@ -572,7 +640,7 @@ function moveAndSlide(obj, velocity) {
 
     if ((truncatedY < currentLevel.h) == (truncatedY >= 0)) {
         for (let i = columnSpan.x; i <= columnSpan.y; i++) {
-            if (currentLevel.tiles[i][truncatedY] == 1) {
+            if (tiles[i][truncatedY] == 1) {
                 vel.y = 0;
                 break;
             }
@@ -602,7 +670,7 @@ function objIsGrounded(obj) {
 
     if ((truncatedY < currentLevel.h) == (truncatedY >= 0)) {
         for (let i = columnSpan.x; i <= columnSpan.y; i++) {
-            if (currentLevel.tiles[i][truncatedY] == 1) {
+            if (tiles[i][truncatedY] == 1) {
                 return true;
             }
         }
@@ -619,7 +687,7 @@ function hammerTile(position, vector) {
         let spanEnd = position.x;
 
         for (let x = position.x; (x < currentLevel.w-1) && (x > 0); x += vector.x) {
-            if (currentLevel.tiles[x][position.y] != 0) {
+            if (tiles[x][position.y] != 0) {
                 //little verbose to save myself from having to write this for loop once for each direction
                 spanStart = min(spanStart, x);
                 spanEnd = max(spanEnd, x);
@@ -672,7 +740,7 @@ function draw() {
     //draw tiles
     for (let y = 0; y < currentLevel.h; y++) {
         for (let x = 0; x < currentLevel.w; x++) {
-            if (currentLevel.tiles[x][y] == 1) {
+            if (tiles[x][y] == 1) {
                 //pixel coordinates onto the tile map
                 let tileX = 0
                 let tileY = 0
