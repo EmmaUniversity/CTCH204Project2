@@ -460,8 +460,8 @@ function shiftTilesRow(spanStart, spanEnd, y, direction) {
 
     }
 
-    setupTileMeta(createVector(spanStart+direction, y), createVector(1, 1));
-    setupTileMeta(createVector(spanEnd+direction, y), createVector(1, 1));
+    //setupTileMeta(createVector(spanStart+direction, y), createVector(1, 1));
+    //setupTileMeta(createVector(spanEnd+direction, y), createVector(1, 1));
 
 }
 
@@ -584,7 +584,7 @@ function hammerTile(position, vector) {
         let spanEnd = position.x;
 
         for (let x = position.x; (x < currentLevel.w-1) && (x > 0); x += vector.x) {
-            if (currentLevel.tiles[x-currentLevel.x][position.y-currentLevel.y] != 0) {
+            if (currentLevel.tiles[x][position.y] != 0) {
                 //little verbose to save myself from having to write this for loop once for each direction
                 spanStart = min(spanStart, x);
                 spanEnd = max(spanEnd, x);
@@ -593,8 +593,7 @@ function hammerTile(position, vector) {
             }
         }
 
-
-
+        shiftTilesRow(spanStart, spanEnd, position.y, vector.x)
 
     }
 
