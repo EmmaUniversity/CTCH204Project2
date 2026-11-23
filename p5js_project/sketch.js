@@ -108,6 +108,23 @@ const objPlayer = {
         }
 
 
+        //death
+        let centerTileMeta = tileMeta[floor(center.x)-currentLevel.x][floor(center.y)-currentLevel.y];
+        if (centerTileMeta != null) {
+            for (let i = 0; i < centerTileMeta.length; i++) {
+                if (centerTileMeta[i].type == "nailPoint") {
+                    restartLevel();
+
+                    //sync feet position with reset position
+                    for (let i = 0; i < this.animFeet.length; i++) {
+                        let foot = this.animFeet[i];
+                        foot.position.x = this.position.x*16;
+                        foot.position.y = this.position.y*16;
+                    }
+                }
+            }
+        }
+
         //tile selection
         if (keyIsDown('w')) {
             //upward selection
