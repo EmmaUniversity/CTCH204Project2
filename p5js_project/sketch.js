@@ -551,6 +551,20 @@ function shiftTilesRow(spanStart, spanEnd, y, direction) {
         if ((tiles[spanStart+1][y+1] == 1) || (tiles[spanStart+1][y-1] == 1)) {
             tileMeta[spanStart+1][y] = null;
         }
+
+        //nail point
+        if (spandEnd+1 != currentLevel.w) {
+            if (tiles[spanEnd+2][y] == 0) {
+                let meta = {
+                    type: "nailPoint",
+                    direction: createVector(-direction, 0)
+                }
+                tileMeta[spanEnd+1][y] = [meta];
+            } else {
+                tileMeta[spanEnd+1][y] = null;
+            }
+        }
+
     } else {
         //hammer left
 
@@ -563,6 +577,19 @@ function shiftTilesRow(spanStart, spanEnd, y, direction) {
 
         if ((tiles[spanEnd-1][y+1] == 1) || (tiles[spanEnd-1][y-1] == 1)) {
             tileMeta[spanEnd-1][y] = null;
+        }
+
+        //nail point
+        if (spanStart-1 != 0) {
+            if (tiles[spanStart-2][y] == 0) {
+                let meta = {
+                    type: "nailPoint",
+                    direction: createVector(-direction, 0)
+                }
+                tileMeta[spanStart-1][y] = [meta];
+            } else {
+                tileMeta[spanStart-1][y] = null;
+            }
         }
     }
 
@@ -582,6 +609,20 @@ function shiftTilesColumn(spanStart, spanEnd, x, direction) {
         if ((tiles[x+1][spanStart+1] == 1) || (tiles[x-1][spanStart+1] == 1)) {
             tileMeta[x][spanStart+1] = null;
         }
+
+        //nail point
+        if (spanEnd+1 != currentLevel.h) {
+            if (tiles[x][spanEnd+2] == 0) {
+                let meta = {
+                    type: "nailPoint",
+                    direction: createVector(0, -direction) 
+                }
+                tileMeta[x][spanEnd+1] = [meta];
+            } else {
+                tileMeta[x][spanEnd+1] = null;
+            }
+        }
+
     } else {
         //hammer up
 
@@ -594,6 +635,19 @@ function shiftTilesColumn(spanStart, spanEnd, x, direction) {
 
         if ((tiles[x+1][spanEnd-1] == 1) || (tiles[x-1][spanEnd-1] == 1)) {
             tileMeta[x][spanEnd-1] = null;
+        }
+
+        //nail point
+        if (spanStart-1 != 0) {
+            if (tiles[x][spanStart-2] == 0) {
+                let meta = {
+                    type: "nailPoint",
+                    direction: createVector(0, -direction) 
+                }
+                tileMeta[x][spanStart-1] = [meta];
+            } else {
+                tileMeta[x][spanStart-1] = null;
+            }
         }
 
     }
@@ -808,7 +862,15 @@ function draw() {
                                 if ((meta.direction.y == -1) || (meta.direction.x == 1)) {
                                     tileY += 16;
                                 }
-                            } 
+                            } else if (meta.type == "nailPoint") {
+                                tileY += 48;
+                                if (meta.direction.y != 0) {
+                                    tileX += 16;
+                                }
+                                if ((meta.direction.y == -1) || (meta.direction.x == 1)) {
+                                    tileY += 16;
+                                }
+                            }
                         }
                     }
                 }
