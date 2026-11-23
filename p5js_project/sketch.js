@@ -85,8 +85,19 @@ const objPlayer = {
         }
 
         //selection
-        this.selectedTile.x = floor((this.position.x+this.isFacingR*2.99)-1)-currentLevel.x;
-        this.selectedTile.y = floor(this.position.y+0.5)-currentLevel.y;
+        if (keyIsDown('w')) {
+            //upward selection
+            this.selectedTile.x = floor(this.position.x+0.5)-currentLevel.x;
+            this.selectedTile.y = floor((this.position.y)-1)-currentLevel.y;
+        } else if (keyIsDown('s')) {
+            //downward selection
+            this.selectedTile.x = floor(this.position.x+0.5)-currentLevel.x;
+            this.selectedTile.y = floor((this.position.y+2.99)-1)-currentLevel.y;
+        } else {
+            //horizontal selection
+            this.selectedTile.x = floor((this.position.x+this.isFacingR*2.99)-1)-currentLevel.x;
+            this.selectedTile.y = floor(this.position.y+0.5)-currentLevel.y;
+        }
 
         this.isSelectValid = false;
         switch (tool) {
