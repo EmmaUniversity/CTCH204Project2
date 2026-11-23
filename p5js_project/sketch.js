@@ -81,7 +81,12 @@ const objPlayer = {
         this.velocity.y = max(-0.5, this.velocity.y+0.025);
 
         //execute the movement
-        this.velocity = moveAndSlide(this, this.velocity);
+        //if current tool is hammer, the player needs to be able to pass through spikes so they can collide with them
+        if (tool == 1) {
+            this.velocity = moveAndSlide(this, this.velocity, ["nailPoint"]);
+        } else {
+            this.velocity = moveAndSlide(this, this.velocity);
+        }
 
 
         //levels
@@ -669,7 +674,8 @@ function instantiateObject(objPrototype, position) { //maybe misuing the word pr
 // -<>- GAME LOGIC -<>-
 
 //this whole function is pretty ugly and repetitive, but I'm not sure what the cleaner what to do it is
-function moveAndSlide(obj, velocity) {
+//mask is meta data types that collision will ignore
+function moveAndSlide(obj, velocity, mask=[]) {
     //technically I could just let moveAndSlide update the object's actual velocity,
     //and maybe this would save a couple lines of code, but this feels safer
     let vel = velocity.copy();
@@ -693,8 +699,20 @@ function moveAndSlide(obj, velocity) {
     if ((truncatedX < currentLevel.w) && (truncatedX >= 0)) {
         for (let i = rowSpan.x; i <= rowSpan.y; i++) {
             if (tiles[truncatedX][i] == 1) {
-                vel.x = 0;
-                break;
+                
+                let masked = false; //if the tile has a meta data item which is included in the masked types
+                if (tileMeta[truncatedX][i] != null) {
+                    for (let j = 0; j < tileMeta[truncatedX][i].length; j++) {
+                        if (mask.includes(tileMeta[truncatedX][i][j].type)) {
+                            masked = true;
+                        }
+                    }
+                }
+
+                if (!masked) {
+                    vel.x = 0;
+                    break;
+                }
             }
         }
     }
@@ -727,8 +745,20 @@ function moveAndSlide(obj, velocity) {
     if ((truncatedY < currentLevel.h) == (truncatedY >= 0)) {
         for (let i = columnSpan.x; i <= columnSpan.y; i++) {
             if (tiles[i][truncatedY] == 1) {
-                vel.y = 0;
-                break;
+                
+                let masked = false; //if the tile has a meta data item which is included in the masked types
+                if (tileMeta[i][truncatedY] != null) {
+                    for (let j = 0; j < tileMeta[i][truncatedY].length; j++) {
+                        if (mask.includes(tileMeta[i][truncatedY][j].type)) {
+                            masked = true;
+                        }
+                    }
+                }
+
+                if (!masked) {
+                    vel.y = 0;
+                    break;
+                }
             }
         }
     }
