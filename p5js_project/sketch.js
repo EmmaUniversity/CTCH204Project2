@@ -40,6 +40,12 @@ const objPlayer = {
     },
 
     step: function() {
+        if (ended) {
+            //when you enter the final room
+            this.position.x -= 0.1;
+            return;
+        }
+        
         //movement
         //TODO: implement angel frames
         //horizontal movement
@@ -277,6 +283,9 @@ let objects = [];
 // 2 = paintbrush
 let tool = 0;
 
+let ended = false; //set to true when the you've beat the game
+let endingLevel = 13; //hard coding this because I don't need anything more complicated
+
 let cameraPosition;
 
 //level transition animation
@@ -390,6 +399,10 @@ function loadLevel(index) {
         oldLevelPosition = createVector(currentLevel.x, currentLevel.y);
         oldLevelSize = createVector(currentLevel.w, currentLevel.h);
         transitionAnimationTick = 0;
+    }
+
+    if (index == endingLevel) {
+        ended = true;
     }
 
     currentLevelId = index;
@@ -701,11 +714,21 @@ function draw() {
 
     //borders to hide out of bounds objects and fix flickering on level edges when camera moves
     //bugged when a room's bound match the size of the screen because the rectangles have 0 width/height and don't draw
-    viewport.fill(255);
-    viewport.rect(currentCamera.x*16, currentCamera.y*16, viewport.width, ((currentLevel.y-currentCamera.y)*16)+1)
-    viewport.rect(currentCamera.x*16, ((currentLevel.y+currentLevel.h)*16)-1, viewport.width, (((currentCamera.y+(viewport.height/16))-(currentLevel.y+currentLevel.h))*16)+2)
-    viewport.rect(currentCamera.x*16, currentCamera.y*16, ((currentLevel.x-currentCamera.x)*16)+1, viewport.height);
-    viewport.rect(((currentLevel.x+currentLevel.w)*16)-1, currentCamera.y*16, (((currentCamera.x+(viewport.width/16))-(currentLevel.x+currentLevel.w))*16)+2, viewport.height);
+    
+    if (!ended) {
+        viewport.fill(255);
+        viewport.rect(currentCamera.x*16, currentCamera.y*16, viewport.width, ((currentLevel.y-currentCamera.y)*16)+1)
+        viewport.rect(currentCamera.x*16, ((currentLevel.y+currentLevel.h)*16)-1, viewport.width, (((currentCamera.y+(viewport.height/16))-(currentLevel.y+currentLevel.h))*16)+2)
+        viewport.rect(currentCamera.x*16, currentCamera.y*16, ((currentLevel.x-currentCamera.x)*16)+1, viewport.height);
+        viewport.rect(((currentLevel.x+currentLevel.w)*16)-1, currentCamera.y*16, (((currentCamera.x+(viewport.width/16))-(currentLevel.x+currentLevel.w))*16)+2, viewport.height);
+    } else {
+        //when you enter the final room, don't let the fog follow you
+        viewport.fill(255);
+        viewport.rect(currentCamera.x*16, currentCamera.y*16, viewport.width, ((oldLevelPosition.y-currentCamera.y)*16)+1)
+        viewport.rect(currentCamera.x*16, ((oldLevelPosition.y+oldLevelSize.h)*16)-1, viewport.width, (((currentCamera.y+(viewport.height/16))-(oldLevelPosition.y+oldLevelSize.h))*16)+2)
+        viewport.rect(currentCamera.x*16, currentCamera.y*16, ((oldLevelPosition.x-currentCamera.x)*16)+1, viewport.height);
+        viewport.rect(((oldLevelPosition.x+oldLevelSize.w)*16)-1, currentCamera.y*16, (((currentCamera.x+(viewport.width/16))-(oldLevelPosition.x+oldLevelSize.w))*16)+2, viewport.height);
+    }
 
     if (transitionAnimationTick < 1) {
         viewport.fill(255-(max(lerp(80, 0, transitionAnimationTick*2), 0)));
