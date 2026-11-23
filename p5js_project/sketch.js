@@ -448,6 +448,8 @@ function setupTileMeta(postion, size) {
 //x coordinates in tile space not world space
 function shiftTilesRow(spanStart, spanEnd, y, direction) {
     if (direction == 1) {
+        //hammer right
+        
         for (let x = spanEnd; x >= spanStart; x--) {
             currentLevel.tiles[x+1][y] = currentLevel.tiles[x][y];
             tileMeta[x+1][y] = tileMeta[x][y];
@@ -455,14 +457,24 @@ function shiftTilesRow(spanStart, spanEnd, y, direction) {
         currentLevel.tiles[spanStart][y] = 0;
         tileMeta[spanStart][y] = null;
 
-        
+        if ((currentLevel.tiles[spanStart+1][y+1] == 1) || (currentLevel.tiles[spanStart+1][y-1] == 1)) {
+            tileMeta[spanStart+1][y] = null;
+        }
     } else {
+        //hammer left
 
+        for (let x = spanStart; x <= spanEnd; x++) {
+            currentLevel.tiles[x-1][y] = currentLevel.tiles[x][y];
+            tileMeta[x-1][y] = tileMeta[x][y];
+        }
+        currentLevel.tiles[spanEnd][y] = 0;
+        tileMeta[spanEnd][y] = null;
+
+        if ((currentLevel.tiles[spanEnd-1][y+1] == 1) || (currentLevel.tiles[spanEnd-1][y-1] == 1)) {
+            tileMeta[spanEnd-1][y] = null;
+        }
     }
-
-    //setupTileMeta(createVector(spanStart+direction, y), createVector(1, 1));
-    //setupTileMeta(createVector(spanEnd+direction, y), createVector(1, 1));
-
+    
 }
 
 
