@@ -860,7 +860,7 @@ function hammerTile(position, vector) {
 
 function draw() {
     //set tools
-    if (keyIsDown('1')) {
+    if (keyIsDown(' ')) {
         tool = 1;
     } else {
         tool = 0;
