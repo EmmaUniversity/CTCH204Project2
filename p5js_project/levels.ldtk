@@ -1207,9 +1207,9 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [{ "__identifier": "Title", "__type": "String", "__value": "Hold Your Hammer", "__tile": null, "defUid": 13, "realEditorValues": [{
+			"fieldInstances": [{ "__identifier": "Title", "__type": "String", "__value": "Hold Your Hammer, (or click your mouse)", "__tile": null, "defUid": 13, "realEditorValues": [{
 				"id": "V_String",
-				"params": ["Hold Your Hammer"]
+				"params": ["Hold Your Hammer, (or click your mouse)"]
 			}] }],
 			"layerInstances": [
 				{
