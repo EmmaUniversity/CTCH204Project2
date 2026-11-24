@@ -880,8 +880,8 @@ function draw() {
     //camera animation
     //maps 0 to 1 on a linear curve to 0 to 1 on a cos curve where 0 is PI and 1 is 0/2PI
     let smoothTransition = (-cos(transitionAnimationTick*PI)/2)+0.5
-    let currentCamera = createVector((lerp(cameraPositionOld.x, cameraPosition.x, smoothTransition)),
-                                     (lerp(cameraPositionOld.y, cameraPosition.y, smoothTransition)));
+    let currentCamera = createVector(((floor(lerp(cameraPositionOld.x, cameraPosition.x, smoothTransition)*16))/16),
+                                     ((floor(lerp(cameraPositionOld.y, cameraPosition.y, smoothTransition)*16))/16));
     viewport.translate(-currentCamera.x*16, -currentCamera.y*16); 
 
     transitionAnimationTick = min(transitionAnimationTick+0.025, 1);
